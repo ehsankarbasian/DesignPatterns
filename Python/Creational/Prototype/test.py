@@ -9,13 +9,65 @@ sys.path.append(path)
 import copy
 
 
+class _InnerAttr:
+            pass
+        
+class _Attr:
+    def __init__(self, inner_attr):
+        self.inner_attr = inner_attr
+
+class _Obj:
+    def __init__(self, attr):
+        self.attr = attr
+
+
 class SingletonPatternTestCase(TestCase):
     
     def setUp(self):
-        pass
+        self.inner_attr = _InnerAttr()
+        self.attr = _Attr(inner_attr = self.inner_attr)
+        self.obj = _Obj(attr=self.attr)
     
     def tearDown(self):
-        pass
+        del self.obj
+        del self.attr
+        del self.inner_attr
+    
+    def test_instance_changes_with_shallowcopy(self):
+        old_obj_id = id(self.obj)
+        obj_copy = copy.copy(self.obj)
+        new_obj_id = id(obj_copy)
+        self.assertNotEqual(old_obj_id, new_obj_id)
+    
+    def test_instance_attr_not_changes_with_shallowcopy(self):
+        old_attr_id = id(self.obj.attr)
+        obj_copy = copy.copy(self.obj)
+        new_attr_id = id(obj_copy.attr)
+        self.assertEqual(old_attr_id, new_attr_id)
+    
+    def test_instance_inner_attr_not_changes_with_shallowcopy(self):
+        old_inner_attr_id = id(self.obj.attr.inner_attr)
+        obj_copy = copy.copy(self.obj)
+        new_inner_attr_id = id(obj_copy.attr.inner_attr)
+        self.assertEqual(old_inner_attr_id, new_inner_attr_id)
+    
+    def test_instance_changes_with_deepcopy(self):
+        old_obj_id = id(self.obj)
+        obj_copy = copy.deepcopy(self.obj)
+        new_obj_id = id(obj_copy)
+        self.assertNotEqual(old_obj_id, new_obj_id)
+    
+    def test_instance_attr_changes_with_deepcopy(self):
+        old_attr_id = id(self.obj.attr)
+        obj_copy = copy.deepcopy(self.obj)
+        new_attr_id = id(obj_copy.attr)
+        self.assertNotEqual(old_attr_id, new_attr_id)
+    
+    def test_instance_inner_attr_changes_with_deepcopy(self):
+        old_inner_attr_id = id(self.obj.attr.inner_attr)
+        obj_copy = copy.deepcopy(self.obj)
+        new_inner_attr_id = id(obj_copy.attr.inner_attr)
+        self.assertNotEqual(old_inner_attr_id, new_inner_attr_id)
     
     def test_pointer_not_changes_with_assignment(self):
         final_list = []
