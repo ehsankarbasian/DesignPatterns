@@ -36,6 +36,7 @@ class DoorFactory:
         return WoodenDoor(width, height)
 
 
+# How to use:
 door = DoorFactory.make_door(100, 200)
 print(f'Width:  {door.width}')
 print(f'Height: {door.height}')

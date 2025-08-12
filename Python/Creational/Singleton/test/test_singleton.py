@@ -25,9 +25,10 @@ class SingletonPatternTestCase(TestCase):
         
         self.blah_child_1 = BlahBlahChild()
         self.blah_child_2 = BlahBlahChild()
+        super().setUp()
     
     def tearDown(self):
-        pass
+        super().tearDown()
     
     def test_singleton(self):
         self.assertEqual(self.blah_1, self.blah_2)

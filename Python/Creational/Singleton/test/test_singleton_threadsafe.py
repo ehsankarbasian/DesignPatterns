@@ -10,7 +10,7 @@ from threading import Thread
 from singleton_thread_safe import SingletonPatternThreadSafe
 
 
-class SingletonPatternTestCase(TestCase):
+class SingletonPatternThreadSafeTestCase(TestCase):
     _FIRST_FOO_VALUE = "FOO"
     
     def setUp(self):
@@ -29,9 +29,10 @@ class SingletonPatternTestCase(TestCase):
                 self.value = value
         
         self.Foo = Foo
+        super().setUp()
     
     def tearDown(self):
-        pass
+        super().tearDown()
     
     def _test_singleton(self, value):
         foo = self.Foo(value=value)

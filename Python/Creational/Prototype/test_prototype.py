@@ -21,17 +21,19 @@ class _Obj:
         self.attr = attr
 
 
-class SingletonPatternTestCase(TestCase):
+class PrototypePatternTestCase(TestCase):
     
     def setUp(self):
         self.inner_attr = _InnerAttr()
         self.attr = _Attr(inner_attr = self.inner_attr)
         self.obj = _Obj(attr=self.attr)
+        super().setUp()
     
     def tearDown(self):
         del self.obj
         del self.attr
         del self.inner_attr
+        super().tearDown()
     
     def test_instance_changes_with_shallowcopy(self):
         old_obj_id = id(self.obj)

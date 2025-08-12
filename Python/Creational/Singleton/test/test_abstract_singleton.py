@@ -35,9 +35,10 @@ class SingletonABCPatternTestCase(TestCase):
             pass
         self.blah_child_1 = BlahBlahChild()
         self.blah_child_2 = BlahBlahChild()
+        super().setUp()
     
     def tearDown(self):
-        pass
+        super().tearDown()
     
     def test_is_abstract(self):
         self.assertTrue(isabstract(self.AbstractSingleton))

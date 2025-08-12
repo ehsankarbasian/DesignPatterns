@@ -11,7 +11,7 @@ from time import sleep
 from singleton_violating_multithread import SingletonPatternThreadSafeToViolate
 
 
-class SingletonPatternTestCase(TestCase):
+class SingletonPatternNotThreadSafeTestCase(TestCase):
     
     def setUp(self):
         class Foo(metaclass=SingletonPatternThreadSafeToViolate):
@@ -19,9 +19,10 @@ class SingletonPatternTestCase(TestCase):
                 self.value = value
         
         self.Foo = Foo
+        super().setUp()
     
     def tearDown(self):
-        pass
+        super().tearDown()
     
     def _test_singleton(self, value):
         if value == 1:
