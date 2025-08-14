@@ -52,3 +52,16 @@ class DonkeyAdapter(LionInterface):
 donkey = Donkey()
 adapted_donkey = DonkeyAdapter(donkey)
 hunter.hunt(adapted_donkey)
+
+
+# Can be implemented like this too:
+# Benefit: No need to use or even import the Donkey class in the client code
+
+class DonkeyAdapter(LionInterface, Donkey):
+    
+    def roar(self):
+        print('Inside adapted', end=' ')
+        self.ar_ar()
+
+adapted_donkey = DonkeyAdapter()
+hunter.hunt(adapted_donkey)
