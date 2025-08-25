@@ -11,13 +11,13 @@ class InterviewerInterface(ABC):
 class Developer(InterviewerInterface):
     
     def ask_questions(self):
-        print('Asking about programming.')
+        print('\nAsking about programming.')
 
 
 class HREmployee(InterviewerInterface):
     
     def ask_questions(self):
-        print('Where do you see yourself in five years later !?')
+        print('\nWhere do you see yourself in five years later !?')
 
 
 class AbstractHiringManager(ABC):
