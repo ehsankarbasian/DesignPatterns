@@ -12,9 +12,10 @@ from singleton_thread_safe import SingletonPatternThreadSafe
 
 class SingletonPatternThreadSafeTestCase(TestCase):
     _FIRST_FOO_VALUE = "FOO"
+    _SETUP_META_SINGLETON = SingletonPatternThreadSafe
     
     def setUp(self):
-        class BlahBlah(metaclass=SingletonPatternThreadSafe):
+        class BlahBlah(metaclass=self._SETUP_META_SINGLETON):
             pass
         class BlahBlahChild(BlahBlah):
             pass
@@ -24,7 +25,7 @@ class SingletonPatternThreadSafeTestCase(TestCase):
         self.blah_child_1 = BlahBlahChild()
         self.blah_child_2 = BlahBlahChild()
         
-        class Foo(metaclass=SingletonPatternThreadSafe):
+        class Foo(metaclass=self._SETUP_META_SINGLETON):
             def __init__(self, value):
                 self.value = value
         

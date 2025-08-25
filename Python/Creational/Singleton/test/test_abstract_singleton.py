@@ -12,9 +12,10 @@ from singleton import SingletonABCPattern
 
 
 class SingletonABCPatternTestCase(TestCase):
+    _SETUP_META_SINGLETON = SingletonABCPattern
     
     def setUp(self):
-        class AbstractSingletonBlahBlah(metaclass=SingletonABCPattern):
+        class AbstractSingletonBlahBlah(metaclass=self._SETUP_META_SINGLETON):
             @property
             @abstractmethod
             def p(self):
