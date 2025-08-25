@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
 
+# AbstractProduct_1
 class Door(ABC):
     
     @abstractmethod
@@ -8,18 +9,20 @@ class Door(ABC):
         pass
 
 
+# ConcreteProduct_1
 class WoodenDoor(Door):
     
     def get_description(self):
-        print('I am a wooden door')
+        print('\nI am a wooden door')
 
 
 class IronDoor(Door):
     
     def get_description(self):
-        print('I am an iron door')
+        print('\nI am an iron door')
 
 
+# AbstractProduct_2
 class DoorFittingExpert(ABC):
     
     @abstractmethod
@@ -27,6 +30,7 @@ class DoorFittingExpert(ABC):
         pass
 
 
+# ConcreteProduct_2
 class Welder(DoorFittingExpert):
     
     def get_description(self):
@@ -39,6 +43,7 @@ class Carpenter(DoorFittingExpert):
         print('I can only fit wooden doors')
 
 
+# AbstractFactory
 class DoorFactory(ABC):
     
     @abstractmethod
@@ -50,6 +55,7 @@ class DoorFactory(ABC):
         pass
 
 
+# ConcreteFactory
 class WoodenDoorFactory(DoorFactory):
     
     def make_door(self):
