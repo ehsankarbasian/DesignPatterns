@@ -8,13 +8,16 @@ sys.path.append(path)
 
 from threading import Thread
 from time import sleep
-from singleton_violating_multithread import SingletonPatternThreadSafeToViolate
+from abc import abstractmethod
+
+from singleton_violating_multithread import SingletonPatternThreadSafeToViolate, SingletonABCPatternThreadSafeToViolate
 
 
 class SingletonPatternNotThreadSafeTestCase(TestCase):
+    _SINGLETON_META_CLASS = SingletonPatternThreadSafeToViolate
     
     def setUp(self):
-        class Foo(metaclass=SingletonPatternThreadSafeToViolate):
+        class Foo(metaclass=self._SINGLETON_META_CLASS):
             def __init__(self, value):
                 self.value = value
         
@@ -39,6 +42,13 @@ class SingletonPatternNotThreadSafeTestCase(TestCase):
         foo_id_1 = int(self.foo_id_1)
         foo_id_2 = int(self.foo_id_2)
         self.assertNotEqual(foo_id_1, foo_id_2)
+
+
+class SingletonABCPatternNotThreadSafeTestCase(SingletonPatternNotThreadSafeTestCase):
+    _SINGLETON_META_CLASS = SingletonABCPatternThreadSafeToViolate
+    
+    def setUp(self):
+        return super().setUp()
 
 
 if __name__=='__main__':
