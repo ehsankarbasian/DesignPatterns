@@ -9,6 +9,8 @@ class MetaSingletonMonoStateByLogfilePattern(type):
         So the class is not completely singleton
         It's singleton by kwargs['log_file] value
         If kwargs['log_file] be different, new instance will be created
+        
+        You can easily make it ThreadSafe if necessary with lock the if statement
         '''
         
         log_file = kwargs.get('log_file', '__DEFAULT__')
