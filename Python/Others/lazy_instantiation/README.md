@@ -5,3 +5,5 @@
 `semi_dynamic_cache.py`
 <br>
 `dynamic_cache.py`
+<br>
+`cache_how_to_use.py`
