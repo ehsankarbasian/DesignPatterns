@@ -3,5 +3,3 @@ from singleton import SingletonABCPattern as SingletonABC
 
 from singleton_thread_safe import SingletonPatternThreadSafe as SingletonThread
 from singleton_thread_safe import SingletonABCPatternThreadSafe as SingletonThreadABC
-
-from singleton_lazy_instantiation import SingletonLazyInstantiation as SingletonLazy
