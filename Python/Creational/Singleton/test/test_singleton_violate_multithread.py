@@ -8,7 +8,6 @@ sys.path.append(path)
 
 from threading import Thread
 from time import sleep
-from abc import abstractmethod
 
 from singleton_violating_multithread import SingletonPatternThreadSafeToViolate, SingletonABCPatternThreadSafeToViolate
 

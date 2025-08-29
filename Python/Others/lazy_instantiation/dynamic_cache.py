@@ -14,6 +14,7 @@ class _DependentCachedProperty(cached_property):
             raise __InputTypeException('depends_on Must be a list')
         self.depends_on = depends_on
         
+        # Save cache
         super().__init__(func)
 
 
@@ -30,24 +31,37 @@ class CachedPropertyDependencyMixin:
 
         # Invalidate all dependent cached_propertis
         for key, attr_value in type(self).__dict__.items():
-            is_dependent_property = isinstance(attr_value, _DependentCachedProperty)
-            
-            if is_dependent_property:
+            if self._is_dependent_property(attr_value):
                 is_depended = attr_name in attr_value.depends_on
-                
                 if is_depended:
-                    if key in self.__dict__:
-                        self.__dict__.pop(key, None)
+                    self._delete_cache(key)
+    
+    @staticmethod
+    def _is_dependent_property(attr_value):
+        return isinstance(attr_value, _DependentCachedProperty)
+    
+    
+    def _delete_cache(self, key):
+        if key in self.__dict__:
+            self.__dict__.pop(key, None)
     
     
     def invalidate_cache(self, *names):
-        # Invalidate cached propeties manually
-        for attr_name in names:
-            if attr_name not in type(self).__dict__:
-                raise Exception(f'AttibuteError: {self.__class__} has no attribute: "{attr_name}"')
-            attr_value = type(self).__dict__[attr_name]
-            if isinstance(attr_value, _DependentCachedProperty) or isinstance(attr_value, cached_property):
-                self.__dict__.pop(attr_name, None)
+        for name in names:
+            self._check_attr_exists(name)
+            self._invalidate_one_cache(name)
+    
+    
+    def _check_attr_exists(self, attr_name):
+        if attr_name not in type(self).__dict__:
+            raise Exception(f'AttibuteError: {self.__class__} has no attribute: "{attr_name}"')
+    
+    
+    def _invalidate_one_cache(self, attr_name):
+        # Invalidate cached property manually
+        attr_value = type(self).__dict__[attr_name]
+        if isinstance(attr_value, _DependentCachedProperty) or isinstance(attr_value, cached_property):
+            self.__dict__.pop(attr_name, None)
 
 
 print("\nWarning: Any class uses the decorator @dependent_cached_property, MUST inherit CachedPropertyDependencyMixin")
