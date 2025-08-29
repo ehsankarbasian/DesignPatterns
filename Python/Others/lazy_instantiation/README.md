@@ -11,6 +11,16 @@ it's usefull to lazy_instantiation
 <br>
 `dynamic_cache.py`
 <br>
-`cache_how_to_use.py`
+`how_to_use.py`
 
-Now you can study `lazy_instantiation.py` and implement your codes according to it.
+Now you can study `lazy_instantiation.py` and implement your codes according to it's pattern.
+
+<hr>
+
+#### Read the thread_safe files only if necessary
+
+`simple_thread_safe.py`
+<br>
+`dynamic_cache_thread_safe.py`
+<br>
+`how_to_use_thread_safe.py`

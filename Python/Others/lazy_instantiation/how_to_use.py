@@ -1,10 +1,9 @@
 import math
 
-from dynamic_cache import CachedPropertyDependencyMixin
-from dynamic_cache import dependent_cached_property
+from __init__ import NotThreadSafe
 
 
-class Circle(CachedPropertyDependencyMixin):
+class Circle(NotThreadSafe.CachedPropertyDependencyMixin):
     def __init__(self, radius):
         self._radius = radius
     
@@ -16,7 +15,7 @@ class Circle(CachedPropertyDependencyMixin):
     def radius(self, value):
         self._radius = value
     
-    @dependent_cached_property(depends_on=['radius'])
+    @NotThreadSafe.dependent_cached_property(depends_on=['radius'])
     def area(self):
         print('Calculating the @cached_property ...')
         return math.pi * self.radius ** 2
