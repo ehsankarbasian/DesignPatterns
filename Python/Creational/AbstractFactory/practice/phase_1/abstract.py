@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from logger import LogMethodCallsMixin
 
 
 # Abstract Factory
@@ -22,7 +23,7 @@ class ProductFactory(ABC):
 
 
 # Not a part of the pattern, just to DRY
-class _AbstractBaseProduct(ABC):
+class _AbstractBaseProduct(ABC, LogMethodCallsMixin):
     @property
     @abstractmethod
     def weight(self):
@@ -81,6 +82,10 @@ class AbstractTV(_AbstractBaseProduct, _AbstractMediaPlayerProduct):
     def __init__(self, diameter):
         self._diameter = diameter
         super().__init__()
+    
+    @property
+    def diameter(self):
+        return self._diameter
     
     @abstractmethod
     def increase_screen_brightness(self):

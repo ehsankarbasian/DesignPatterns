@@ -22,13 +22,10 @@ if __name__ == "__main__":
     lg_factory = LgFactory()
     
     small_samsung_tv = samsung_factory.make_tv(diameter=12)
-    mid_samsung_tv = samsung_factory.make_tv(diameter=27)
-    big_samsung_tv = samsung_factory.make_tv(diameter=52)
-    
-    small_sony_tv = sony_factory.make_tv(diameter=12)
-    mid_sony_tv = sony_factory.make_tv(diameter=27)
     big_sony_tv = sony_factory.make_tv(diameter=52)
-    
-    small_lg_tv = lg_factory.make_tv(diameter=12)
     mid_lg_tv = lg_factory.make_tv(diameter=27)
-    big_lg_tv = lg_factory.make_tv(diameter=52)
+    
+    big_sony_tv.channel_down()
+    mid_lg_tv.weight
+    small_samsung_tv.turn_on()
+    small_samsung_tv.diameter
