@@ -8,14 +8,14 @@ class LgFactory(ProductFactory):
     def make_tv(self, diameter):
         return _LgTv(diameter=diameter)
     
-    def make_radio(self):
-        pass
+    def make_radio(self, version):
+        return _LgRadio(version=version)
     
-    def make_phone(self):
-        pass
+    def make_phone(self, model):
+        return _LgPhone(model=model)
     
-    def make_camera(self):
-        pass
+    def make_camera(self, mega_pixels):
+        return _LgCamera(mega_pixels=mega_pixels)
 
 
 # Concrete Products
@@ -103,7 +103,7 @@ class _LgRadio(AbstractRadio):
         pass
 
     def set_mode(self, mode):
-        pass
+        self._mode = mode
 
 
 class _LgPhone(AbstractPhone):

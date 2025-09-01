@@ -8,14 +8,14 @@ class SamaungFactory(ProductFactory):
     def make_tv(self, diameter):
         return _SamsungTv(diameter)
     
-    def make_radio(self):
-        pass
+    def make_radio(self, version):
+        return _SamsungRadio(version=version)
     
-    def make_phone(self):
-        pass
+    def make_phone(self, model):
+        return _SamsungPhone(model=model)
     
-    def make_camera(self):
-        pass
+    def make_camera(self, mega_pixels):
+        return _SamsungCamera(mega_pixels=mega_pixels)
 
 
 # Concrete Products
@@ -103,7 +103,7 @@ class _SamsungRadio(AbstractRadio):
         pass
 
     def set_mode(self, mode):
-        pass
+        self._mode = mode
 
 
 class _SamsungPhone(AbstractPhone):

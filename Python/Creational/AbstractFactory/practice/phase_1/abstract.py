@@ -10,15 +10,15 @@ class ProductFactory(ABC):
         pass
     
     @abstractmethod
-    def make_radio(self):
+    def make_radio(self, version):
         pass
     
     @abstractmethod
-    def make_phone(self):
+    def make_phone(self, model):
         pass
     
     @abstractmethod
-    def make_camera(self):
+    def make_camera(self, mega_pixels):
         pass
 
 
@@ -98,12 +98,28 @@ class AbstractTV(_AbstractBaseProduct, _AbstractMediaPlayerProduct):
 
 class AbstractRadio(_AbstractBaseProduct, _AbstractMediaPlayerProduct):
     
+    def __init__(self, version):
+        self._version = version
+        super().__init__()
+    
+    @property
+    def version(self):
+        return self._version
+    
     @abstractmethod
     def set_mode(self, mode):
         pass
 
 
 class AbstractPhone(_AbstractBaseProduct):
+    
+    def __init__(self, model):
+        self._model = model
+        super().__init__()
+    
+    @property
+    def model(self):
+        return self._model
     
     @abstractmethod
     def call(self, number):
@@ -115,6 +131,14 @@ class AbstractPhone(_AbstractBaseProduct):
 
 
 class AbstractCamera(_AbstractBaseProduct):
+    
+    def __init__(self, mega_pixels):
+        self._mega_pixels = mega_pixels
+        super().__init__()
+    
+    @property
+    def mega_pixels(self):
+        return self._mega_pixels
     
     @abstractmethod
     def take_picture(self):
