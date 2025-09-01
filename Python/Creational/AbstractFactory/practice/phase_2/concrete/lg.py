@@ -1,5 +1,5 @@
 from abstract import AbstractProductFactory
-from abstract import AbstractTV, AbstractRadio, AbstractPhone, AbstractCamera
+from abstract import AbstractTV, AbstractRadio, AbstractPhone, AbstractCamera, AbstractVacuumCleaner, AbstractLaundry, AbstractFridge
 
 
 # Concrete Factory
@@ -172,4 +172,136 @@ class _LgCamera(AbstractCamera):
         pass
     
     def zoom_out(self):
+        pass
+
+
+class _LgVacuumCleaner(AbstractVacuumCleaner):
+    
+    @property
+    def weight(self):
+        pass
+    
+    @property
+    def average_life_span(self):
+        pass
+    
+    @property
+    def warranty_expiration_date(self):
+        pass
+    
+    def turn_on(self):
+        pass
+    
+    def turn_off(self):
+        pass
+
+    @property
+    def power(self):
+        pass
+    
+    @property
+    def grade(self):
+        pass
+    
+    @property
+    def color(self):
+        pass
+    
+    def make_clean(self):
+        pass
+    
+    def set_level(self):
+        pass
+    
+    def restract_cord(self):
+        pass
+
+
+class _LgLaundry(AbstractLaundry):
+    
+    @property
+    def weight(self):
+        pass
+    
+    @property
+    def average_life_span(self):
+        pass
+    
+    @property
+    def warranty_expiration_date(self):
+        pass
+    
+    def turn_on(self):
+        pass
+    
+    def turn_off(self):
+        pass
+
+    @property
+    def power(self):
+        pass
+    
+    @property
+    def grade(self):
+        pass
+    
+    @property
+    def color(self):
+        pass
+    
+    def make_clean(self):
+        pass
+    
+    @property
+    def capacity(self):
+        pass
+    
+    def set_program(self):
+        pass
+
+
+class _LgFridge(AbstractFridge):
+    
+    @property
+    def weight(self):
+        pass
+    
+    @property
+    def average_life_span(self):
+        pass
+    
+    @property
+    def warranty_expiration_date(self):
+        pass
+    
+    def turn_on(self):
+        pass
+    
+    def turn_off(self):
+        pass
+
+    @property
+    def power(self):
+        pass
+    
+    @property
+    def grade(self):
+        pass
+    
+    @property
+    def color(self):
+        pass
+    
+    def make_clean(self):
+        pass
+    
+    @property
+    def feet_tall(self):
+        pass
+    
+    @property
+    def temperature(self):
+        pass
+    
+    def boost(self):
         pass
