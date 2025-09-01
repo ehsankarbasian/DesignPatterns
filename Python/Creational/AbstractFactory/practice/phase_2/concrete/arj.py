@@ -36,11 +36,11 @@ class _ArjVacuumCleaner(AbstractVacuumCleaner):
     
     @property
     def average_life_span(self):
-        pass
+        return '__AFTER_YOUR_LAST_CHILD_DEATH__'
     
     @property
     def warranty_expiration_date(self):
-        pass
+        return '__YOUR_DEAD_THAT_DAY__'
     
     def turn_on(self):
         pass
@@ -78,11 +78,11 @@ class _ArjLaundry(AbstractLaundry):
     
     @property
     def average_life_span(self):
-        pass
+        return '__FOR_LIFE__'
     
     @property
     def warranty_expiration_date(self):
-        pass
+        return 'The name you know an trust it !'
     
     def turn_on(self):
         pass
@@ -121,14 +121,14 @@ class _ArjFridge(AbstractFridge):
     
     @property
     def average_life_span(self):
-        pass
+        return '__YOU_WILL_DIE_EARLIER__'
     
     @property
     def warranty_expiration_date(self):
-        pass
+        return '__NEWER_NEED_FIX__'
     
     def turn_on(self):
-        pass
+        print('Here we go again !')
     
     def turn_off(self):
         pass

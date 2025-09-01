@@ -80,19 +80,27 @@ if __name__ == "__main__":
     sony_camera.weight
     
     print('\nCreate and use Vacuum Cleaners:')
-    lg_factory
-    samsung_factory
-    arj_factory
-    azmayesh_factory
+    lg_vacuum_cleaner = lg_factory.make_vacuum_cleaner(model_number=15)
+    arj_vacuum_cleaner = arj_factory.make_vacuum_cleaner(model_number=2)
+    lg_vacuum_cleaner.turn_off()
+    arj_vacuum_cleaner.turn_on()
+    print(arj_vacuum_cleaner.warranty_expiration_date)
+    print(arj_vacuum_cleaner.average_life_span)
     
     print('\nCreate and use Laundries:')
-    lg_factory
-    samsung_factory
-    arj_factory
-    azmayesh_factory
+    samsung_laundary = samsung_factory.make_laundry(generation=12)
+    arj_laundary = arj_factory.make_laundry(generation=4224)
+    azmayesh_laundary = azmayesh_factory.make_laundry(generation=2)
+    samsung_laundary.turn_off()
+    print(arj_laundary.warranty_expiration_date)
+    azmayesh_laundary.turn_off()
     
     print('\nCreate and use Fridges:')
-    lg_factory
-    samsung_factory
-    arj_factory
-    azmayesh_factory
+    lg_fridge = lg_factory.make_fridge(type_='freezer')
+    arj_fridge = arj_factory.make_fridge(type_='fridge')
+    azmayesh_fridge = azmayesh_factory.make_fridge(type_='freezer-fridge')
+    lg_fridge.turn_off()
+    arj_fridge.turn_on()
+    print(arj_fridge.average_life_span)
+    print(arj_fridge.warranty_expiration_date)
+    print(azmayesh_fridge.average_life_span)

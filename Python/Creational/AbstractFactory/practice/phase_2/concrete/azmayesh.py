@@ -121,7 +121,7 @@ class _AzmayeshFridge(AbstractFridge):
     
     @property
     def average_life_span(self):
-        pass
+        return '__NOT_AS_SOON_AS_YOUR_DEATH__'
     
     @property
     def warranty_expiration_date(self):
