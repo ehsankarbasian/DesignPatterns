@@ -2,24 +2,15 @@ from abc import ABC, abstractmethod
 from logger import LogMethodCallsMixin
 
 
-# Abstract Factory
-class AbstractProductFactory(ABC):
-    
-    @abstractmethod
-    def make_tv(self, diameter):
-        pass
-    
-    @abstractmethod
-    def make_radio(self, version):
-        pass
+# Abstract Factories
+class AbstractPhoneFactory(ABC):
     
     @abstractmethod
     def make_phone(self, model):
         pass
-    
-    @abstractmethod
-    def make_camera(self, mega_pixels):
-        pass
+
+
+class AbstractHomeApplianceFactory(ABC):
     
     @abstractmethod
     def make_vacuum_cleaner(self, model_number):
@@ -31,6 +22,21 @@ class AbstractProductFactory(ABC):
     
     @abstractmethod
     def make_fridge(self, type_):
+        pass
+
+
+class AbstractMediaFactory(ABC):
+    
+    @abstractmethod
+    def make_tv(self, diameter):
+        pass
+    
+    @abstractmethod
+    def make_radio(self, version):
+        pass
+    
+    @abstractmethod
+    def make_camera(self, mega_pixels):
         pass
 
 
