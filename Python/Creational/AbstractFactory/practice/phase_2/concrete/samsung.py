@@ -1,9 +1,9 @@
-from abstract import ProductFactory
+from abstract import AbstractProductFactory
 from abstract import AbstractTV, AbstractRadio, AbstractPhone, AbstractCamera
 
 
 # Concrete Factory
-class SamaungFactory(ProductFactory):
+class SamaungFactory(AbstractProductFactory):
     
     def make_tv(self, diameter):
         return _SamsungTv(diameter)
@@ -16,6 +16,15 @@ class SamaungFactory(ProductFactory):
     
     def make_camera(self, mega_pixels):
         return _SamsungCamera(mega_pixels=mega_pixels)
+    
+    def make_vacuum_cleaner(self, model_number):
+        pass
+    
+    def make_laundry(self, generation):
+        pass
+    
+    def make_fridge(self, type_):
+        pass
 
 
 # Concrete Products

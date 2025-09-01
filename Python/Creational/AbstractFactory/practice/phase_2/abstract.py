@@ -3,7 +3,7 @@ from logger import LogMethodCallsMixin
 
 
 # Abstract Factory
-class ProductFactory(ABC):
+class AbstractProductFactory(ABC):
     
     @abstractmethod
     def make_tv(self, diameter):
@@ -19,6 +19,18 @@ class ProductFactory(ABC):
     
     @abstractmethod
     def make_camera(self, mega_pixels):
+        pass
+    
+    @abstractmethod
+    def make_vacuum_cleaner(self, model_number):
+        pass
+    
+    @abstractmethod
+    def make_laundry(self, generation):
+        pass
+    
+    @abstractmethod
+    def make_fridge(self, type_):
         pass
 
 

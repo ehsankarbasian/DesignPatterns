@@ -1,9 +1,9 @@
-from abstract import ProductFactory
+from abstract import AbstractProductFactory
 from abstract import AbstractTV, AbstractRadio, AbstractPhone, AbstractCamera
 
 
 # Concrete Factory
-class SonyFactory(ProductFactory):
+class SonyFactory(AbstractProductFactory):
     
     def make_tv(self, diameter):
         return _SonyTv(diameter=diameter)
@@ -16,6 +16,15 @@ class SonyFactory(ProductFactory):
     
     def make_camera(self, mega_pixels):
         return _SonyCamera(mega_pixels=mega_pixels)
+    
+    def make_vacuum_cleaner(self, model_number):
+        raise Exception
+    
+    def make_laundry(self, generation):
+        raise Exception
+    
+    def make_fridge(self, type_):
+        raise Exception
 
 
 # Concrete products
