@@ -18,13 +18,13 @@ class SamaungFactory(AbstractProductFactory):
         return _SamsungCamera(mega_pixels=mega_pixels)
     
     def make_vacuum_cleaner(self, model_number):
-        pass
+        return _SamsungVacuumCleaner(model_number=model_number)
     
     def make_laundry(self, generation):
-        pass
+        return _SamsungLaundry(generation=generation)
     
     def make_fridge(self, type_):
-        pass
+        return _SamsungFridge(type_=type_)
 
 
 # Concrete Products

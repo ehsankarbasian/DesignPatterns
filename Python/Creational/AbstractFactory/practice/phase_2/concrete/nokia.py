@@ -1,18 +1,18 @@
 from abstract import AbstractProductFactory
-from abstract import AbstractTV, AbstractPhone
+from abstract import AbstractPhone
 
 
 # Concrete Factory
 class NokiaFactory(AbstractProductFactory):
     
     def make_tv(self, diameter):
-        pass
+        raise Exception
     
     def make_radio(self, version):
         raise Exception
     
     def make_phone(self, model):
-        pass
+        return _NokiaPhone(model=model)
     
     def make_camera(self, mega_pixels):
         raise Exception
@@ -27,73 +27,29 @@ class NokiaFactory(AbstractProductFactory):
         raise Exception
 
 
-class _NokiaTv(AbstractTV):
-    
-    @property
-    def weight(self):
-        pass
-    
-    @property
-    def average_life_span(self):
-        pass
-    
-    @property
-    def warranty_expiration_date(self):
-        pass
-    
-    def turn_on(self):
-        pass
-    
-    def turn_off(self):
-        pass
-
-    def channel_up(self):
-        pass
-    
-    def channel_down(self):
-        pass
-    
-    def volume_up(self):
-        pass
-    
-    def volume_down(self):
-        pass
-    
-    def mute(self):
-        pass
-    
-    def unmute(self):
-        pass
-
-    def increase_screen_brightness(self):
-        pass
-    
-    def decrease_screen_brightness(self):
-        pass
-
-
+# Concrete Products
 class _NokiaPhone(AbstractPhone):
     
     @property
     def weight(self):
-        pass
+        return '__MORE_THAN_OTHERS__'
     
     @property
     def average_life_span(self):
-        pass
+        return '__NEWER_DIE__'
     
     @property
     def warranty_expiration_date(self):
-        pass
+        return '__NO_NEED__'
     
     def turn_on(self):
-        pass
+        print('Another legend ...')
     
     def turn_off(self):
-        pass
+        print('Boss wanna rest')
 
     def call(self, number):
-        pass
+        print('__CONNECTING_PEOPLE__')
     
     def reject_call(self):
-        pass
+        print('Disconnecting people !!!')

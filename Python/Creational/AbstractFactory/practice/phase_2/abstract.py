@@ -195,6 +195,14 @@ class AbstractCamera(_AbstractBaseProduct):
 
 class AbstractVacuumCleaner(_AbstractBaseProduct, _AbstractHomeApplianceProduct):
     
+    def __init__(self, model_number):
+        self._model_number = model_number
+        super().__init__()
+    
+    @property
+    def model_number(self):
+        return self._model_number
+    
     @abstractmethod
     def set_level(self):
         pass
@@ -205,6 +213,14 @@ class AbstractVacuumCleaner(_AbstractBaseProduct, _AbstractHomeApplianceProduct)
 
 
 class AbstractLaundry(_AbstractBaseProduct, _AbstractHomeApplianceProduct):
+    
+    def __init__(self, generation):
+        self._generation = generation
+        super().__init__()
+    
+    @property
+    def generation(self):
+        return self._generation
     
     @property
     @abstractmethod
@@ -217,6 +233,14 @@ class AbstractLaundry(_AbstractBaseProduct, _AbstractHomeApplianceProduct):
 
 
 class AbstractFridge(_AbstractBaseProduct, _AbstractHomeApplianceProduct):
+    
+    def __init__(self, type_):
+        self._type_ = type_
+        super().__init__()
+    
+    @property
+    def type_(self):
+        return self._type_
     
     @property
     @abstractmethod

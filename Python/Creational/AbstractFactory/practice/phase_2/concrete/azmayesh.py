@@ -18,13 +18,13 @@ class AzmayeshFactory(AbstractProductFactory):
         raise Exception
     
     def make_vacuum_cleaner(self, model_number):
-        pass
+        return _AzmayeshVacuumCleaner(model_number=model_number)
     
     def make_laundry(self, generation):
-        pass
+        return _AzmayeshLaundry(generation=generation)
     
     def make_fridge(self, type_):
-        pass
+        return _AzmayeshFridge(type_=type_)
 
 
 # Concrete Products

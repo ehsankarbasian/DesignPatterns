@@ -18,13 +18,13 @@ class LgFactory(AbstractProductFactory):
         return _LgCamera(mega_pixels=mega_pixels)
     
     def make_vacuum_cleaner(self, model_number):
-        pass
+        return _LgVacuumCleaner(model_number=model_number)
     
     def make_laundry(self, generation):
-        pass
+        return _LgLaundry(generation=generation)
     
     def make_fridge(self, type_):
-        pass
+        return _LgFridge(type_=type_)
 
 
 # Concrete Products

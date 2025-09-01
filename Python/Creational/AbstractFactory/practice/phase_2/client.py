@@ -1,4 +1,4 @@
-from concrete import SamaungFactory, SonyFactory, LgFactory
+from concrete import SamaungFactory, SonyFactory, LgFactory, NokiaFactory, ArjFactory, AzmayeshFactory
 
 '''
 Implement products [
@@ -24,7 +24,7 @@ Raise Exception if the brand doesn't produce the product
 The productions of each brand matrix:
                 |    LG      |  Samsung   |    Sony    |    Arj     |  Azmayesh  |    Nokia   |
     Radio       |     1      |     1      |     1      |     0      |     0      |     0      |
-    TV          |     1      |     1      |     1      |     0      |     0      |     1      |
+    TV          |     1      |     1      |     1      |     0      |     0      |     0      |
     Phone       |     1      |     1      |     1      |     0      |     0      |     1      |
     Camera      |     1      |     1      |     1      |     0      |     0      |     0      |
   VacuumCleaner |     1      |     1      |     0      |     1      |     1      |     0      |
@@ -38,6 +38,9 @@ if __name__ == "__main__":
     samsung_factory = SamaungFactory()
     sony_factory = SonyFactory()
     lg_factory = LgFactory()
+    nokia_factory = NokiaFactory()
+    arj_factory = ArjFactory()
+    azmayesh_factory = AzmayeshFactory()
     
     print('\nCreate and use TVs:')
     small_samsung_tv = samsung_factory.make_tv(diameter=12)
@@ -48,7 +51,7 @@ if __name__ == "__main__":
     small_samsung_tv.turn_on()
     small_samsung_tv.diameter
     
-    print('\nCreate and use radios:')
+    print('\nCreate and use Radios:')
     old_sony_radio = sony_factory.make_radio(version=2)
     new_samsung_radio = samsung_factory.make_radio(version=14)
     old_sony_radio.set_mode(mode='FM')
@@ -58,9 +61,16 @@ if __name__ == "__main__":
     print('\nCreate and use Phones:')
     good_sony_phone = sony_factory.make_phone(model='Xperia')
     lg_wing_phone = lg_factory.make_phone(model='wing')
+    nokia_1 = nokia_factory.make_phone(model='1200')
+    nokia_2 = nokia_factory.make_phone(model='6600')
     good_sony_phone.call(number='0999***1111')
     lg_wing_phone.reject_call()
     good_sony_phone.turn_off()
+    nokia_1.call(number='0999***2222')
+    print(nokia_1.average_life_span)
+    nokia_1.turn_off()
+    nokia_2.turn_on()
+    nokia_2.reject_call()
     
     print('\nCreate and use Cameras:')
     sony_camera = sony_factory.make_camera(mega_pixels=128)
@@ -68,3 +78,21 @@ if __name__ == "__main__":
     sony_camera.take_picture()
     samsung_camera.take_film
     sony_camera.weight
+    
+    print('\nCreate and use Vacuum Cleaners:')
+    lg_factory
+    samsung_factory
+    arj_factory
+    azmayesh_factory
+    
+    print('\nCreate and use Laundries:')
+    lg_factory
+    samsung_factory
+    arj_factory
+    azmayesh_factory
+    
+    print('\nCreate and use Fridges:')
+    lg_factory
+    samsung_factory
+    arj_factory
+    azmayesh_factory
