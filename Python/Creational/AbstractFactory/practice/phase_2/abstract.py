@@ -24,6 +24,7 @@ class ProductFactory(ABC):
 
 # Not a part of the pattern, just to DRY
 class _AbstractBaseProduct(ABC, LogMethodCallsMixin):
+    
     @property
     @abstractmethod
     def weight(self):
@@ -73,6 +74,29 @@ class _AbstractMediaPlayerProduct(ABC):
     
     @abstractmethod
     def unmute(self):
+        pass
+
+
+# Not a part of the pattern, just to DRY
+class _AbstractHomeApplianceProduct(ABC):
+    
+    @property
+    @abstractmethod
+    def power(self):
+        pass
+    
+    @property
+    @abstractmethod
+    def grade(self):
+        pass
+    
+    @property
+    @abstractmethod
+    def color(self):
+        pass
+    
+    @abstractmethod
+    def make_clean(self):
         pass
 
 
@@ -154,4 +178,44 @@ class AbstractCamera(_AbstractBaseProduct):
     
     @abstractmethod
     def zoom_out(self):
+        pass
+
+
+class AbstractVacuumCleaner(_AbstractBaseProduct, _AbstractHomeApplianceProduct):
+    
+    @abstractmethod
+    def set_level(self):
+        pass
+    
+    @abstractmethod
+    def restract_cord(self):
+        pass
+
+
+class AbstractLaundry(_AbstractBaseProduct, _AbstractHomeApplianceProduct):
+    
+    @property
+    @abstractmethod
+    def capacity(self):
+        pass
+    
+    @abstractmethod
+    def set_program(self):
+        pass
+
+
+class AbstractFridge(_AbstractBaseProduct, _AbstractHomeApplianceProduct):
+    
+    @property
+    @abstractmethod
+    def feet_tall(self):
+        pass
+    
+    @property
+    @abstractmethod
+    def temperature(self):
+        pass
+    
+    @abstractmethod
+    def boost(self):
         pass
