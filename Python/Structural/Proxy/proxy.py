@@ -2,11 +2,23 @@ import random
 from abc import ABC, abstractmethod
 
 
+'''
+Applications:
+    Caching
+    Lazy Loading
+    Access Control
+    Protection Proxy
+    Logging and Monitoring
+'''
+
+
 # Helper function to know is user authenticated or not
 def is_authenticated():
     return bool(random.randint(0, 1))
 
 
+# Subject interface
+# Both RealSubject and ProxySubject class should implement the interface (Liskov)
 class DoorInterface(ABC):
     
     @abstractmethod
@@ -18,6 +30,7 @@ class DoorInterface(ABC):
         pass
 
 
+# RealSubject
 class LabDoor(DoorInterface):
     
     def open_(self):
@@ -27,6 +40,7 @@ class LabDoor(DoorInterface):
         print('Closing the lab door')
 
 
+# ProxySubject (composition relationship with the real subject)
 class SecuredDoor(DoorInterface):
     
     def __init__(self, door):
@@ -42,6 +56,7 @@ class SecuredDoor(DoorInterface):
         self._door.close()
 
 
+# Client code
 door = SecuredDoor(LabDoor())
 door.open_()
 door.open_()
