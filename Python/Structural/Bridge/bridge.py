@@ -33,7 +33,7 @@ class AbstractDevice(ABC):
         pass
 
 
-class DeviceOperationPrinter:
+class DeviceOperationPrinterMixin:
     """
     It's a helper, not a part of the pattern
     """
@@ -46,7 +46,7 @@ class DeviceOperationPrinter:
         print(f'"{self._class_name}" {what_happend}')
 
 
-class TV(AbstractDevice, DeviceOperationPrinter):
+class TV(AbstractDevice, DeviceOperationPrinterMixin):
     
     def __init__(self):
         self._is_enabled = False
@@ -84,7 +84,7 @@ class TV(AbstractDevice, DeviceOperationPrinter):
         self._print_operation(f'channel is setted: {valid_channel}')
 
 
-class Radio(AbstractDevice, DeviceOperationPrinter):
+class Radio(AbstractDevice, DeviceOperationPrinterMixin):
     
     def __init__(self):
         self._is_enabled = False
@@ -122,7 +122,7 @@ class Radio(AbstractDevice, DeviceOperationPrinter):
         self._print_operation(f'channel is setted: {valid_channel}')
 
 
-class RemoteOperationPrinter:
+class RemoteOperationPrinterMixin:
     """
     It's a helper, not a part of the pattern
     """
@@ -139,7 +139,7 @@ class RemoteOperationPrinter:
         print(f'"{self._class_name}" {what} the "{self._device_name}"')
 
 
-class RemoteControl(RemoteOperationPrinter):
+class RemoteControl(RemoteOperationPrinterMixin):
     
     def __init__(self, device):
         self._device = device
