@@ -1,13 +1,8 @@
 from unittest import TestCase
 import unittest
 
-import pathlib
-import sys
-path = str(pathlib.Path(__file__).parent.parent.absolute())
-sys.path.append(path)
 
 import copy
-
 
 class _InnerAttr:
             pass
