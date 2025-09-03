@@ -2,6 +2,12 @@ from unittest import TestCase
 import unittest
 
 
+'''
+It's not common to test libraries
+Read the tests below as example to learn copy
+'''
+
+
 import copy
 
 class _InnerAttr:

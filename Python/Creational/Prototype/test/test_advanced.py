@@ -31,6 +31,10 @@ class ShallowCopyTestCase(TestCase):
     def test_shallow_copied_component_attr_changes(self):
         self.component.some_list_of_objects[1].add(4)
         self.assertTrue(4 in self.shallow_copied_component.some_list_of_objects[1])
+    
+    def test_inner_attribute_changes(self):
+        self.component.some_list_of_objects[2][2] = 100
+        self.assertEqual(self.shallow_copied_component.some_list_of_objects[2][2], 100)
 
 
 class DeepCopyTestCase(TestCase):
@@ -58,6 +62,10 @@ class DeepCopyTestCase(TestCase):
         id_1 = id(self.deep_copied_component.some_circular_ref.parent)
         id_2 = id(self.deep_copied_component.some_circular_ref.parent.some_circular_ref.parent)
         self.assertEqual(id_1, id_2)
+    
+    def test_inner_attribute_not_changes(self):
+        self.component.some_list_of_objects[2][2] = 100
+        self.assertNotEqual(self.deep_copied_component.some_list_of_objects[2][2], 100)
 
 
 if __name__ == "__main__":
