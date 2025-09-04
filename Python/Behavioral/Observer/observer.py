@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
 
+# Publisher
 class JopPost:
     
     def __init__(self, title):
@@ -11,6 +12,7 @@ class JopPost:
         return self._title
 
 
+# Subscriber
 class Observer(ABC):
     
     @abstractmethod
@@ -18,6 +20,7 @@ class Observer(ABC):
         pass
 
 
+# Concrete Subscriber
 class JobSeeker(Observer):
     
     def __init__(self, name):
