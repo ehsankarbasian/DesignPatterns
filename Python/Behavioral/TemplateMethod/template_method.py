@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-# Template abstract classs
+# Template abstract class
 class AbstractBuilder(ABC):
     
     # Template method
@@ -11,6 +11,7 @@ class AbstractBuilder(ABC):
         self.assemble()
         self.deploy()
     
+    # Step methods
     @abstractmethod
     def test(self):
         pass
@@ -28,7 +29,7 @@ class AbstractBuilder(ABC):
         pass
 
 
-# Template implementation 1
+# Concrete Template 1
 class AndroidBuilder(AbstractBuilder):
     
     def test(self):
@@ -44,7 +45,7 @@ class AndroidBuilder(AbstractBuilder):
         print('Deploying Android builer to server')
 
 
-# Template implementation 2
+# Concrete Template 2
 class IosBuilder(AbstractBuilder):
     
     def test(self):
