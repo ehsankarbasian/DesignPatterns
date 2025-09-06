@@ -2,8 +2,8 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any
 
-# Code from: "https://refactoring.guru/design-patterns/builder/python/example"
 
+# Code from: "https://refactoring.guru/design-patterns/builder/python/example"
 
 class AbstractBuilder(ABC):
 
