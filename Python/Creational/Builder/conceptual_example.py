@@ -9,28 +9,28 @@ class AbstractBuilder(ABC):
 
     @property
     @abstractmethod
-    def product(self) -> None:
+    def product(self):
         pass
 
     @abstractmethod
-    def produce_part_a(self) -> None:
+    def produce_part_a(self):
         pass
 
     @abstractmethod
-    def produce_part_b(self) -> None:
+    def produce_part_b(self):
         pass
 
     @abstractmethod
-    def produce_part_c(self) -> None:
+    def produce_part_c(self):
         pass
 
 
 class ConcreteBuilder(AbstractBuilder):
 
-    def __init__(self) -> None:
+    def __init__(self):
         self.reset()
 
-    def reset(self) -> None:
+    def reset(self):
         self._product = Product()
 
     @property
@@ -39,22 +39,22 @@ class ConcreteBuilder(AbstractBuilder):
         self.reset()
         return product
 
-    def produce_part_a(self) -> None:
+    def produce_part_a(self):
         self._product.add("PartA1")
 
-    def produce_part_b(self) -> None:
+    def produce_part_b(self):
         self._product.add("PartB1")
 
-    def produce_part_c(self) -> None:
+    def produce_part_c(self):
         self._product.add("PartC1")
 
 
-class Product():
+class Product:
     
-    def __init__(self) -> None:
+    def __init__(self):
         self.parts = []
 
-    def add(self, part: Any) -> None:
+    def add(self, part: Any):
         self.parts.append(part)
 
     @property
@@ -64,7 +64,7 @@ class Product():
 
 class Director:
 
-    def __init__(self) -> None:
+    def __init__(self):
         self._builder = None
 
     @property
@@ -72,13 +72,13 @@ class Director:
         return self._builder
 
     @builder.setter
-    def builder(self, builder: AbstractBuilder) -> None:
+    def builder(self, builder: AbstractBuilder):
         self._builder = builder
 
-    def build_minimal_viable_product(self) -> None:
+    def build_minimal_viable_product(self):
         self.builder.produce_part_a()
 
-    def build_full_featured_product(self) -> None:
+    def build_full_featured_product(self):
         self.builder.produce_part_a()
         self.builder.produce_part_b()
         self.builder.produce_part_c()
