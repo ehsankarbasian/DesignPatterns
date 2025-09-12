@@ -1,9 +1,10 @@
+from __future__ import annotations
 from abc import ABC, abstractmethod
 
 
 class CommandInterface(ABC):
     
-    def __init__(self, app, editor):
+    def __init__(self, app: Application, editor: Editor):
         self._app = app
         self._editor = editor
     
@@ -46,10 +47,10 @@ class CommandHistory:
     def __init__(self):
         self._history = []
     
-    def push(self, command):
+    def push(self, command: CommandInterface):
         self._history.append(command)
 
-    def pop(self, command):
+    def pop(self, command: CommandInterface):
         return self._history.pop(command)
 
 
@@ -74,7 +75,7 @@ class Application:
         self.clipboard = ''
         self.history = CommandHistory()
     
-    def execute_command(self, command):
+    def execute_command(self, command: CommandInterface):
         if command.execute():
             self.history.push(command)
 
