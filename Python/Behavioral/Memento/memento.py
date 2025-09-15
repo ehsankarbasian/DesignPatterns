@@ -15,19 +15,30 @@ class Editor:
     
     def __init__(self):
         self._content: str = ''
+        self._mementos: list[EditorMemento] = [EditorMemento(content='')]
+        self._memento_index: int = -1
     
     def type_(self, words: str):
-        self._content += ' ' + words
+        self._content += words
+        self._save()
+    
+    def _save(self) -> None:
+        memento = EditorMemento(self.content)
+        self._mementos.append(memento)
+        self._memento_index = -1
     
     @property
     def content(self) -> str:
         return self._content
     
-    def save(self) -> EditorMemento:
-        return EditorMemento(self.content)
-    
-    def restore(self, memento: EditorMemento) -> None:
-        self._content = memento.content
+    def roll_back(self) -> None:
+        self._memento_index -= 1
+        if self._memento_index < -len(self._mementos):
+            print("Empty History: Can't roll back")
+            self._memento_index += 1
+        else:
+            memento = self._mementos[self._memento_index]
+            self._content = memento.content
 
 
 if __name__ == "__main__":
@@ -35,10 +46,16 @@ if __name__ == "__main__":
     
     editor.type_('This is the first sentence.')
     editor.type_('This is second.')
-    saved = editor.save()
-    
     editor.type_('And this is third.')
     print(editor.content)
     
-    editor.restore(saved)
+    editor.roll_back()
+    print(editor.content)
+    editor.roll_back()
+    print(editor.content)
+    editor.roll_back()
+    print(editor.content)
+    editor.roll_back()
+    print(editor.content)
+    editor.roll_back()
     print(editor.content)
