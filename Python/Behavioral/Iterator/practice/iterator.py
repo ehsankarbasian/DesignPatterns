@@ -1,25 +1,31 @@
 from __future__ import annotations
 from typing import Any, TYPE_CHECKING
 
+from abc import abstractmethod
 from collections.abc import Iterable, Iterator
 
 if TYPE_CHECKING:
-    from binary_tree import BinaryTree, Node
+    from binary_tree import BinaryTree
 
 
-class BaseIterable(Iterable):
+class AbstractBaseIterable(Iterable):
+    
+    @property
+    @abstractmethod
+    def iterate_strategy(self) -> function:
+        pass
     
     def __getitem__(self, index: int):
         return self._collection[index]
 
-    def __iter__(self) -> PreOrderIterator:
-        return PreOrderIterator(self)
+    def __iter__(self) -> BinaryTreeIterator:
+        return BinaryTreeIterator(self)
 
-    def get_reverse_iterator(self) -> PreOrderIterator:
-        return PreOrderIterator(self, reverse=True)
+    def get_reverse_iterator(self) -> BinaryTreeIterator:
+        return BinaryTreeIterator(self, reverse=True)
 
 
-class PreOrderIterator(Iterator):
+class BinaryTreeIterator(Iterator):
     _position: int = None
     _reverse: bool = False
 
@@ -30,10 +36,13 @@ class PreOrderIterator(Iterator):
         self._position = 0
 
     def __next__(self) -> Any:
+        if not hasattr(self._collection, '_iterate_strategy'):
+            raise Exception('Set iterate strategy before iterating')
+        
         # Sorting happens only when the first items is actually requested.
         if self._sorted_items is None:
             root = self._collection._collection[0]
-            self._sorted_items = PreOrderIterator._preorder(root)
+            self._sorted_items = self._collection.iterate_strategy(root)
             if self._reverse:
                 self._sorted_items = list(reversed(self._sorted_items))
 
@@ -42,15 +51,3 @@ class PreOrderIterator(Iterator):
         value = self._sorted_items[self._position]
         self._position += 1
         return value
-    
-    
-    @staticmethod
-    def _preorder(node: Node, sorted_collection: list[Node] = []):
-        if node is None:
-            return
-        
-        sorted_collection.append(node)
-        PreOrderIterator._preorder(node.left_child, sorted_collection)
-        PreOrderIterator._preorder(node.right_child, sorted_collection)
-        
-        return sorted_collection

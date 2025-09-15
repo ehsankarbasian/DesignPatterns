@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from iterator import BaseIterable
+from iterator import AbstractBaseIterable
 
 
 class Node:
@@ -42,7 +42,15 @@ class Node:
 
 GraphConnection = Node | None
 
-class BinaryTree(BaseIterable):
+class BinaryTree(AbstractBaseIterable):
+    
+    @property
+    def iterate_strategy(self):
+        return self._iterate_strategy
+    
+    @iterate_strategy.setter
+    def iterate_strategy(self, value: function):
+        self._iterate_strategy = value
     
     def __init__(self):
         root = Node(node_name='root')

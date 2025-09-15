@@ -1,4 +1,5 @@
 from binary_tree import BinaryTree
+from order_strategy import preorder
 
 
 collection = BinaryTree()
@@ -11,6 +12,9 @@ e = collection.add_right_child('e', c)
 f = collection.add_right_child('f', a)
 g = collection.add_left_child('g', b)
 h = collection.add_right_child('h', g)
+
+
+collection.iterate_strategy = preorder
 
 for c in collection:
     print(c, end=', ')
