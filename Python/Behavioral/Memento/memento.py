@@ -24,8 +24,12 @@ class Editor:
     
     def _save(self) -> None:
         memento = EditorMemento(self.content)
-        self._mementos.append(memento)
-        self._memento_index = -1
+        
+        if self._memento_index == -1:
+            self._mementos.append(memento)
+        else:
+            self._mementos = self._mementos[0:self._memento_index+1] + [memento]
+            self._memento_index = -1
     
     @property
     def content(self) -> str:
@@ -82,4 +86,23 @@ if __name__ == "__main__":
     editor.roll_forward()
     print(editor.content)
     editor.roll_forward()
+    print(editor.content)
+    
+    editor.roll_back()
+    print(editor.content)
+    editor.roll_back()
+    print(editor.content)
+    editor.type_('The NEW sentence.')
+    print(editor.content)
+    editor.roll_forward()
+    print(editor.content)
+    editor.roll_back()
+    print(editor.content)
+    editor.roll_back()
+    print(editor.content)
+    editor.roll_forward()
+    print(editor.content)
+    editor.roll_back()
+    print(editor.content)
+    editor.roll_back()
     print(editor.content)
