@@ -1,7 +1,8 @@
 from binary_tree import BinaryTree
-from order_strategy import preorder
+from order_strategy import pre_order, post_order, in_order
 
 
+# Initiate collection
 collection = BinaryTree()
 root = collection.root
 a = collection.add_left_child('a', root)
@@ -14,13 +15,31 @@ g = collection.add_left_child('g', b)
 h = collection.add_right_child('h', g)
 
 
-collection.iterate_strategy = preorder
-
+collection.iterate_strategy = pre_order
+print('\nPreOrder:')
 for c in collection:
     print(c, end=', ')
-print()
-
-print()
+print('\nReverse PreOrder:')
 for c in collection.get_reverse_iterator():
     print(c, end=', ')
-print()
+print('\n')
+
+
+collection.iterate_strategy = post_order
+print('PostOrder:')
+for c in collection:
+    print(c, end=', ')
+print('\nReverse PostOrder:')
+for c in collection.get_reverse_iterator():
+    print(c, end=', ')
+print('\n')
+
+
+collection.iterate_strategy = in_order
+print('InOrder:')
+for c in collection:
+    print(c, end=', ')
+print('\nReverse InOrder:')
+for c in collection.get_reverse_iterator():
+    print(c, end=', ')
+print('\n')

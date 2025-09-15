@@ -36,13 +36,14 @@ class BinaryTreeIterator(Iterator):
         self._position = 0
 
     def __next__(self) -> Any:
-        if not hasattr(self._collection, '_iterate_strategy'):
+        tree = self._collection
+        if not hasattr(tree, '_iterate_strategy'):
             raise Exception('Set iterate strategy before iterating')
         
         # Sorting happens only when the first items is actually requested.
         if self._sorted_items is None:
-            root = self._collection._collection[0]
-            self._sorted_items = self._collection.iterate_strategy(root)
+            root = tree._collection[0]
+            self._sorted_items = tree.iterate_strategy(root)
             if self._reverse:
                 self._sorted_items = list(reversed(self._sorted_items))
 
