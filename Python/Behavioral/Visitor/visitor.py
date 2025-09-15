@@ -67,13 +67,29 @@ class Speak(AnimalOperationInterface):
         dolphin.speak()
 
 
+class Jump(AnimalOperationInterface):
+    
+    def visit_monkey(self, monkey):
+        print('Jumped 20 feet high! on to the tree!')
+    
+    def visit_lion(self, lion):
+        print('Jumped 7 feet! Back on the ground!')
+    
+    def visit_dolphin(self, dolphin):
+        print('Walked on water a little and disappeared')
+
+
 if __name__ == "__main__":
     monkey = Monkey()
     lion = Lion()
     dolphin = Dolphin()
     
     speak = Speak()
-    
     monkey.accept(speak)
     lion.accept(speak)
     dolphin.accept(speak)
+    
+    jump = Jump()
+    monkey.accept(jump)
+    lion.accept(jump)
+    dolphin.accept(jump)
