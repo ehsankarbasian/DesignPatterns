@@ -32,13 +32,22 @@ class Editor:
         return self._content
     
     def roll_back(self) -> None:
-        self._memento_index -= 1
-        if self._memento_index < -len(self._mementos):
+        if self._memento_index-1 < -len(self._mementos):
             print("Empty History: Can't roll back")
-            self._memento_index += 1
-        else:
-            memento = self._mementos[self._memento_index]
-            self._content = memento.content
+            return
+            
+        self._memento_index -= 1
+        memento = self._mementos[self._memento_index]
+        self._content = memento.content
+    
+    def roll_forward(self) -> None:
+        if self._memento_index+1 > -1:
+            print("No Forward History: Can't roll forward")
+            return
+        
+        self._memento_index += 1
+        memento = self._mementos[self._memento_index]
+        self._content = memento.content
 
 
 if __name__ == "__main__":
@@ -58,4 +67,19 @@ if __name__ == "__main__":
     editor.roll_back()
     print(editor.content)
     editor.roll_back()
+    print(editor.content)
+    
+    editor.roll_forward()
+    print(editor.content)
+    editor.roll_forward()
+    print(editor.content)
+    editor.roll_back()
+    print(editor.content)
+    editor.roll_forward()
+    print(editor.content)
+    editor.roll_forward()
+    print(editor.content)
+    editor.roll_forward()
+    print(editor.content)
+    editor.roll_forward()
     print(editor.content)
