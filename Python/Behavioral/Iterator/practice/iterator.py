@@ -1,6 +1,10 @@
-from typing import Any
+from __future__ import annotations
+from typing import Any, TYPE_CHECKING
 
 from collections.abc import Iterable, Iterator
+
+if TYPE_CHECKING:
+    from binary_tree import BinaryTree, Node
 
 
 class BaseIterable(Iterable):
