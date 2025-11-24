@@ -1,8 +1,8 @@
-from typing import Optional
+from typing import Optional, List
 
 
 # Domain object
-class User:
+class UserDomainObject:
     
     _id_: int
     _name: str
@@ -31,7 +31,7 @@ class User:
 
 
 # The ORM
-class UserMapper:
+class UserDataMapper:
     
     _db = ...
     
@@ -39,32 +39,45 @@ class UserMapper:
         self._db = db
     
     
-    def get_by_id(self, id_) -> Optional[User]:
+    def fetch_by_identifier(self, id_) -> Optional[UserDomainObject]:
         query = f'SELECT * FROM users WHERE id = {id_}'
         result = self._db.connection.execute_query(query)
         
         if result:
-            return User(result['id_'], result['name'], result['email'])
+            return UserDomainObject(result['id_'], result['name'], result['email'])
         else:
             return None
     
     
-    def save(self, user: User) -> None:
+    def insert(self, user: UserDomainObject) -> int:
         query = f'INSERT INTO users (name, email) VALUES ({user.name}, {user.email})'
         result = self._db.connection.execute_query(query)
         
-        id_ = self._db.last_insert_id
-        user.id_ = id_
-
+        new_identifier = self._db.last_insert_id
+        user.id_ = new_identifier
+        return new_identifier
+    
+    
+    def fetch_all(self) -> List[UserDomainObject]:
+        query = f'SELECT * FROM users'
+        results = self._db.connection.execute_query(query)
+        
+        user_list = []
+        for row in results:
+            user_list.append(UserDomainObject(row["id"], row["name"], row["email"]))
+        
+        return user_list
 
 
 if __name__ == "__main__":
     db = ...
-    user_mapper = UserMapper(db)
+    user_mapper = UserDataMapper(db)
 
-    user = user_mapper.get_by_id(id_=1)
+    user = user_mapper.fetch_by_identifier(id_=1)
     print(user.name)
     print(user.email)
 
-    new_user = User(id_=None, name='ZoorAvar', email='Zoor@example.com')
-    user_mapper.save(new_user)
+    new_user = UserDomainObject(id_=None, name='ZoorAvar', email='Zoor@example.com')
+    user_mapper.insert(new_user)
+    
+    user_mapper.fetch_all()
