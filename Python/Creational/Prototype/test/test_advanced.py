@@ -1,6 +1,7 @@
 from unittest import TestCase
 import unittest
 
+import inspect
 import copy
 
 import pathlib
@@ -66,6 +67,15 @@ class DeepCopyTestCase(TestCase):
     def test_inner_attribute_not_changes(self):
         self.component.some_list_of_objects[2][2] = 100
         self.assertNotEqual(self.deep_copied_component.some_list_of_objects[2][2], 100)
+    
+    def test_deepcopy_memo_default_is_not_mutable(self):
+        signature = inspect.signature(SomeComponent.__deepcopy__)
+        memo_param = signature.parameters["memo"]
+        memo_param_default = memo_param.default
+        self.assertFalse(
+            isinstance(memo_param_default, (dict, list, set)),
+            "__deepcopy__ uses a mutable default for 'memo'. Use memo=None instead."
+        )
 
 
 if __name__ == "__main__":

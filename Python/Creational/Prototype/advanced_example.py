@@ -1,5 +1,7 @@
 import copy
 
+from typing import Optional, Dict
+
 
 '''
 You can override python copy.copy() and copy.deepcopy() functions
@@ -33,7 +35,14 @@ class SomeComponent:
 
         return new_object
 
-    def __deepcopy__(self, memo={}):
+    def __deepcopy__(self, memo: Optional[Dict] = None):
+        # TODO: When internet is connected completely
+        # repair 'mutable default' anti-pattern in refactoring-guru original repository
+        # Do not commit it before doing that
+        # TODO: Add the pythonic_prototype_hint.md text to comments in the original repository
+        if memo is None:
+            memo = {}
+        
         """
         Memo is the dictionary that is used by the `deepcopy` library to
         prevent infinite recursive copies in instances of circular references.
