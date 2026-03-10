@@ -51,4 +51,5 @@ class SingletonABCPatternNotThreadSafeTestCase(SingletonPatternNotThreadSafeTest
 
 
 if __name__=='__main__':
+    print('Please wait ...')
     unittest.main()

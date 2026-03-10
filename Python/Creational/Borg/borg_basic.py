@@ -1,4 +1,4 @@
-# Also known as Borg pattern
+# Also known as MonoState pattern
 # Different instances but states are the same
 
 

@@ -6,7 +6,7 @@ import sys
 path = str(pathlib.Path(__file__).parent.parent.absolute())
 sys.path.append(path)
 
-from monostate import Book
+from borg_basic import Book
 
 
 class SingletonByInputValueTestCase(TestCase):
