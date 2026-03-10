@@ -14,7 +14,7 @@ class MetaSingletonMonoStateByLogfilePattern(type):
         '''
         
         log_file = kwargs.get('log_file', '__DEFAULT__')
-        cls_key = f'{cls} {log_file}'
+        cls_key = (cls, log_file)
         if cls_key not in cls._instance:
             cls._instance[cls_key] = super().__call__(*args, **kwargs)
         return cls._instance[cls_key]

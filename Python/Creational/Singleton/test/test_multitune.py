@@ -6,7 +6,7 @@ import sys
 path = str(pathlib.Path(__file__).parent.parent.absolute())
 sys.path.append(path)
 
-from singleton_by_input_value import Logger
+from multitune import Logger
 
 
 class SingletonByInputValueTestCase(TestCase):
