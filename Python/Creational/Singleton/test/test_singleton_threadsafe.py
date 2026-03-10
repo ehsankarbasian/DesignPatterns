@@ -35,18 +35,26 @@ class SingletonPatternThreadSafeTestCase(TestCase):
     def tearDown(self):
         super().tearDown()
     
-    def _test_singleton(self, value):
+    def _test_singleton(self, value, results):
         foo = self.Foo(value=value)
-        self.foo_id = id(foo)
+        results.append(id(foo))
     
     def test_singleton_with_thread(self):
-        process1 = Thread(target=self._test_singleton, args=(self._FIRST_FOO_VALUE,))
-        process2 = Thread(target=self._test_singleton, args=("BAR",))
-        process1.start()
-        foo_id_1 = int(self.foo_id)
-        process2.start()
-        foo_id_2 = int(self.foo_id)
-        self.assertEqual(foo_id_1, foo_id_2)
+        instance_ids = []
+
+        thread_1 = Thread(target=self._test_singleton, args=(self._FIRST_FOO_VALUE, instance_ids))
+        thread_2 = Thread(target=self._test_singleton, args=("BAR", instance_ids))
+
+        thread_1.start()
+        thread_2.start()
+        thread_1.join()
+        thread_2.join()
+
+        self.assertEqual(
+            len(set(instance_ids)),
+            1,
+            "Singleton is not thread-safe: multiple instances created"
+        )
     
     def test_singleton_without_thread(self):
         self.assertEqual(self.blah_1, self.blah_2)

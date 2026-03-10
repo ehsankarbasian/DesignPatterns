@@ -4,11 +4,13 @@ from threading import Lock
 
 class SingletonPatternThreadSafe(type):
     _instances = {}
+    _locks = {}
 
-    _lock: Lock = Lock()
-    
     def __call__(cls, *args, **kwargs):
-        with cls._lock:
+        if cls not in cls._locks:
+            cls._locks[cls] = Lock()
+        
+        with cls._locks[cls]:
             if cls not in cls._instances:
                 instance = super().__call__(*args, **kwargs)
                 cls._instances[cls] = instance
@@ -18,11 +20,13 @@ class SingletonPatternThreadSafe(type):
 
 class SingletonABCPatternThreadSafe(ABCMeta):
     _instances = {}
-    
-    _lock: Lock = Lock()
+    _locks = {}
     
     def __call__(cls, *args, **kwargs):
-        with cls._lock:
+        if cls not in cls._locks:
+            cls._locks[cls] = Lock()
+        
+        with cls._locks[cls]:
             if cls not in cls._instances:
                 instance = super(SingletonABCPatternThreadSafe, cls).__call__(*args, **kwargs)
                 cls._instances[cls] = instance
