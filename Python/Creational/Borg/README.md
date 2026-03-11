@@ -25,7 +25,7 @@ If only specific attributes represent shared mutable state:
 Rule:
 If an attribute is shared, the lock belongs to that attribute.
 
-Example implementation: `TODO`
+Example implementation: `threadsafe_examples/basic.py`
 
 ---
 
@@ -38,7 +38,7 @@ If shared attributes are implemented using descriptors:
 - The owning class must not bypass the descriptor storage.
 
 Example implementation:
-See `borg_descriptor_threadsafe.py`
+See `threadsafe_examples/descriptor.py`
 
 ---
 

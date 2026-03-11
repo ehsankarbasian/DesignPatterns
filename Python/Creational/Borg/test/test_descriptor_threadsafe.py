@@ -6,7 +6,7 @@ import sys
 path = str(pathlib.Path(__file__).parent.parent.absolute())
 sys.path.append(path)
 
-from borg_descriptor_threadsafe import ApplicationConfig, ThreadSafeSharedAttribute
+from threadsafe_examples.descriptor import ApplicationConfig, ThreadSafeSharedAttribute
 import threading
 
 
