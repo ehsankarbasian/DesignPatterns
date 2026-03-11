@@ -25,7 +25,7 @@ class AdvancedLogger(SharedStateMixin, Service):
     pass
 
 
-class TestBorgMixinAdvanced(TestCase):
+class BorgMixinAdvancedTestCase(TestCase):
 
     def test_instances_share_state(self):
         a = Logger()

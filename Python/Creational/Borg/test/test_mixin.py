@@ -9,7 +9,7 @@ sys.path.append(path)
 from borg_mixin import Logger, Config
 
 
-class TestSharedStateMixin(TestCase):
+class SharedStateMixinTestCase(TestCase):
 
     def setUp(self):
         Logger._shared_state.clear()

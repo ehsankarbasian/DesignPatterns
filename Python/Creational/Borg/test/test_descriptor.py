@@ -9,7 +9,7 @@ sys.path.append(path)
 from borg_descriptor import Borg
 
 
-class TestBorgSharedAttribute(TestCase):
+class BorgSharedAttributeTestCase(TestCase):
 
     def setUp(self):
         # reset shared state before each test
