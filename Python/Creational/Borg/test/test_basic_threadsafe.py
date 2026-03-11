@@ -7,19 +7,25 @@ path = str(pathlib.Path(__file__).parent.parent.absolute())
 sys.path.append(path)
 
 import threading
-from threadsafe_examples.basic import ThreadSafeBorg
+from threadsafe_examples.basic import ThreadSafeBorgBasic
 
 
-class TestThreadSafeBorg(TestCase):
+class ThreadSafeBorgBasicTestCase(TestCase):
 
+    def test_instances_are_different_objects(self):
+        a = ThreadSafeBorgBasic()
+        b = ThreadSafeBorgBasic()
+
+        self.assertIsNot(a, b)
+    
     def test_borg_shared_state(self):
-        a = ThreadSafeBorg()
-        b = ThreadSafeBorg()
+        a = ThreadSafeBorgBasic()
+        b = ThreadSafeBorgBasic()
         a.set("mode", "prod")
         self.assertEqual(b.get("mode"), "prod")
 
     def test_borg_thread_safety(self):
-        borg = ThreadSafeBorg()
+        borg = ThreadSafeBorgBasic()
 
         def worker(idx: int):
             for _ in range(1000):

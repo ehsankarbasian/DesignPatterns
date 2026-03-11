@@ -3,7 +3,7 @@ import threading
 from typing import Any
 
 
-class ThreadSafeBorg:
+class ThreadSafeBorgBasic:
     # Borg with centralized lock protecting the entire shared state.
 
     _shared_state: dict[str, Any] = {}

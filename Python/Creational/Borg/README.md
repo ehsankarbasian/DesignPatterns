@@ -10,7 +10,7 @@ The goal is to prevent race conditions and ensure consistent access when instanc
 If a Borg implementation shares the entire instance `__dict__`:
 <br>**All updates to the shared state must be synchronized at the Borg class level via a central lock.**
 
-Example implementation: `TODO`
+Example implementation: `threadsafe_examples/mixin.py`
 
 ---
 
