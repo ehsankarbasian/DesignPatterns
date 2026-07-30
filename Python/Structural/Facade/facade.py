@@ -1,5 +1,6 @@
 
 class Inventory:
+    
     def check_stock(self, product_id):
         print(f"Checking stock for product {product_id}")
         # Simulate stock check
@@ -10,6 +11,7 @@ class Inventory:
 
 
 class Payment:
+    
     def process_payment(self, amount):
         print(f"Processing payment of ${amount}")
         # Simulate payment processing
@@ -17,11 +19,13 @@ class Payment:
 
 
 class Notification:
+    
     def send_confirmation(self, order_id):
         print(f"Sending confirmation for order {order_id}")
 
 
 class OrderFacade:
+    
     def __init__(self):
         self.inventory = Inventory()
         self.payment = Payment()
