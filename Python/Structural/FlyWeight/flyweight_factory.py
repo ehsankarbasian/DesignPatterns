@@ -3,27 +3,48 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 
+class Canvas:
+    """Drawing target."""
+
+
+# Flyweight: shared state used by many trees.
 @dataclass(frozen=True)
 class TreeType:
+    """Stores intrinsic state shared by multiple trees."""
+
     name: str
     color: str
     texture: str
 
-    def draw(self, canvas: Canvas, horizontal_position: int, vertical_position: int) -> None:
-        canvas.draw_tree(
-            name=self.name,
-            color=self.color,
-            texture=self.texture,
-            horizontal_position=horizontal_position,
-            vertical_position=vertical_position,
+
+    def draw(
+        self,
+        canvas: Canvas,
+        horizontal_position: int,
+        vertical_position: int,
+    ) -> None:
+        
+        print(
+            f"Drawing {self.color} {self.name} with {self.texture} texture "
+            f"at ({horizontal_position}, {vertical_position})"
         )
 
 
+# Factory: reuses an existing flyweight or creates it once.
 class TreeFactory:
+    """Prevents duplicate TreeType objects with the same shared state."""
+
     _tree_types: dict[tuple[str, str, str], TreeType] = {}
 
+
     @classmethod
-    def get_tree_type(cls, name: str, color: str, texture: str) -> TreeType:
+    def get_tree_type(
+        cls,
+        name: str,
+        color: str,
+        texture: str,
+    ) -> TreeType:
+        
         key = (name, color, texture)
 
         if key not in cls._tree_types:
@@ -35,16 +56,16 @@ class TreeFactory:
 
         return cls._tree_types[key]
 
-    @classmethod
-    def total_tree_types(cls) -> int:
-        return len(cls._tree_types)
 
-
+# Context: unique state of an individual tree.
 @dataclass
 class Tree:
+    """Stores a tree position and references a shared TreeType."""
+
     horizontal_position: int
     vertical_position: int
     tree_type: TreeType
+
 
     def draw(self, canvas: Canvas) -> None:
         self.tree_type.draw(
@@ -54,9 +75,13 @@ class Tree:
         )
 
 
+# Client: creates contexts and requests shared flyweights.
 class Forest:
+    """Stores many trees that reuse shared TreeType objects."""
+
     def __init__(self) -> None:
         self.trees: list[Tree] = []
+
 
     def plant_tree(
         self,
@@ -66,41 +91,25 @@ class Forest:
         color: str,
         texture: str,
     ) -> None:
+        
         tree_type = TreeFactory.get_tree_type(
             name=name,
             color=color,
             texture=texture,
         )
 
-        tree = Tree(
-            horizontal_position=horizontal_position,
-            vertical_position=vertical_position,
-            tree_type=tree_type,
+        self.trees.append(
+            Tree(
+                horizontal_position=horizontal_position,
+                vertical_position=vertical_position,
+                tree_type=tree_type,
+            )
         )
 
-        self.trees.append(tree)
 
     def draw(self, canvas: Canvas) -> None:
         for tree in self.trees:
             tree.draw(canvas)
-
-    def total_trees(self) -> int:
-        return len(self.trees)
-
-
-class Canvas:
-    def draw_tree(
-        self,
-        name: str,
-        color: str,
-        texture: str,
-        horizontal_position: int,
-        vertical_position: int,
-    ) -> None:
-        print(
-            f"Drawing {color} {name} with {texture} texture "
-            f"at ({horizontal_position}, {vertical_position})"
-        )
 
 
 if __name__ == "__main__":
@@ -133,5 +142,5 @@ if __name__ == "__main__":
 
     forest.draw(canvas)
 
-    print(f"Total trees: {forest.total_trees()}")
-    print(f"Total tree types: {TreeFactory.total_tree_types()}")
+    print(f"Total trees: {len(forest.trees)}")
+    print(f"Total tree types: {len(TreeFactory._tree_types)}")
