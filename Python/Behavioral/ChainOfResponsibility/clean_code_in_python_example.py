@@ -62,4 +62,32 @@ class LogoutEvent(Event):
     pattern = re.compile(r"(?P<id>\d+):\s+logout\s+(?P<value>\S+)")
 
 
+if __name__ == "__main__":
+    # Client: Assemble the chain of responsibility.
+    # We chain LoginEvent to LogoutEvent.
+    chain = LoginEvent(
+        next_event=LogoutEvent()
+    )
 
+    # Some sample log lines to process.
+    logs = [
+        "101: login ehsan_k",
+        "102: logout ehsan_k",
+        "103: unknown_action data",
+    ]
+
+    print("--- Processing Logs ---")
+    for log in logs:
+        # The client only interacts with the head of the chain.
+        result = chain.process(log)
+        
+        if result:
+            print(f"Processed: {result}")
+        else:
+            # If no one in the chain could process it.
+            print(f"Ignored: '{log}' (No handler found)")
+
+    # Explanation:
+    # 1. '101: login' is matched by LoginEvent (first in chain).
+    # 2. '102: logout' is passed by LoginEvent to LogoutEvent and matched there.
+    # 3. '103: unknown' travels through the whole chain and returns an empty dict.
