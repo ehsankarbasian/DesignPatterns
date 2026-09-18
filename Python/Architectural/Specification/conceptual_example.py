@@ -106,20 +106,31 @@ class PremiumPriceSpecification(AbstractSpecification):
 
 if __name__ == "__main__":
     laptop = Product(name="Laptop", price=1200.0, stock_quantity=5, is_active=True)
-    keyboard = Product(name="Keyboard", price=45.0, stock_quantity=0, is_active=True)
+    out_of_stock_accessory = Product(
+        name="Cable", price=20.0, stock_quantity=0, is_active=True
+    )
+    inactive_item = Product(
+        name="Old Item", price=1500.0, stock_quantity=10, is_active=False
+    )
 
     is_in_stock = InStockSpecification()
     is_active = ActiveProductSpecification()
     is_premium = PremiumPriceSpecification(minimum_price=1000.0)
 
-    # Composite rule: (Active AND InStock) AND PremiumPrice
-    eligible_for_premium_campaign = is_active & is_in_stock & is_premium
+    # Complex rule: Active AND ((Premium AND InStock) OR (~Premium AND ~InStock))
+    eligible_for_special_campaign = is_active & (
+        (is_premium & is_in_stock) | (~is_premium & ~is_in_stock)
+    )
 
     print(
         f"Is {laptop.name} eligible: "
-        f"{eligible_for_premium_campaign.is_satisfied_by(laptop)}"
+        f"{eligible_for_special_campaign.is_satisfied_by(laptop)}"
     )
     print(
-        f"Is {keyboard.name} eligible: "
-        f"{eligible_for_premium_campaign.is_satisfied_by(keyboard)}"
+        f"Is {out_of_stock_accessory.name} eligible: "
+        f"{eligible_for_special_campaign.is_satisfied_by(out_of_stock_accessory)}"
+    )
+    print(
+        f"Is {inactive_item.name} eligible: "
+        f"{eligible_for_special_campaign.is_satisfied_by(inactive_item)}"
     )
