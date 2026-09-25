@@ -48,18 +48,25 @@ class AnimalOperationInterface(ABC):
 class Monkey(AnimalInterface):
     
     def accept(self, operation: AnimalOperationInterface) -> None:
+        # Second Dispatch:
+        # The concrete animal class explicitly binds its own type (`self`)
+        # by calling the dedicated `visit_monkey` method on `operation`.
+        # At runtime, dynamic dispatch resolves which concrete operation
+        # (Speak or Jump) will execute.
         operation.visit_monkey(monkey=self)
 
 
 class Lion(AnimalInterface):
     
     def accept(self, operation: AnimalOperationInterface) -> None:
+        # Second Dispatch:
         operation.visit_lion(lion=self)
 
 
 class Dolphin(AnimalInterface):
     
     def accept(self, operation: AnimalOperationInterface) -> None:
+        # Second Dispatch:
         operation.visit_dolphin(dolphin=self)
 
 
@@ -96,8 +103,12 @@ if __name__ == "__main__":
 
     print("The same hierarchy, different external operations:")
     for animal in animals:
+        # First Dispatch:
+        # Calling `animal.accept(...)` resolves dynamically at runtime based on
+        # the concrete runtime type of `animal` (Monkey, Lion, or Dolphin).
         animal.accept(speak)
 
-    print("Operations are added without touching the animal classes:")
+    print("\nOperations are added without touching the animal classes:")
     for animal in animals:
+        # First Dispatch again with a different concrete operation:
         animal.accept(jump)
