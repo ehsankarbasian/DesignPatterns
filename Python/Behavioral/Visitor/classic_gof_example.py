@@ -179,7 +179,17 @@ Architectural Trade-off Analysis of the Visitor Pattern:
 Design Guideline:
 Use the Visitor pattern when the element class hierarchy is STABLE, but the operations
 performed over those elements change frequently or are open-ended.
+
+
+GOF VISITOR PATTERN - GOLDEN RULE & ARCHITECTURAL TRADE-OFF
+
+Use the Visitor pattern when the object structure classes (elements) 
+rarely change, but you frequently need to define new operations over 
+the structure. Adding a new operation is easy (just add a new visitor),
+but adding a new element class requires updating every visitor interface 
+and all its concrete implementations
 """
+
 
 # Pattern Role: Client Code
 if __name__ == "__main__":
