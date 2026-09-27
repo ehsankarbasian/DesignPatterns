@@ -67,8 +67,13 @@ SalesGroupBuilderCallback = Callable[["SalesGroupBuilder"], None]
 # Builder: Constructs hierarchical Composite trees using scoped builders and callbacks.
 class SalesGroupBuilder:
 
-    def __init__(self) -> None:
+    def __init__(self, name: str) -> None:
+        self._name = name
         self._children: list[AbstractSalesUnit] = []
+
+    @classmethod
+    def named(cls, name: str) -> SalesGroupBuilder:
+        return cls(name)
 
     def add_agent(
         self,
@@ -85,7 +90,7 @@ class SalesGroupBuilder:
     ) -> SalesGroupBuilder:
         # A fresh builder isolates the configuration of the nested group
         # from the builder that is constructing its parent group.
-        nested_builder = SalesGroupBuilder()
+        nested_builder = SalesGroupBuilder.named(name)
 
         # The runtime leverages the Python call stack: entering the lambda pushes a new
         # frame with its own scoped builder, diving deeper into the tree.
@@ -93,13 +98,13 @@ class SalesGroupBuilder:
 
         # Once the callback finishes and unwinds (pops), the nested composite unit is built
         # and attached to the parent, effectively replacing mutable state and navigation (up()).
-        nested_group = nested_builder.build(name)
+        nested_group = nested_builder.build()
         self._children.append(nested_group)
 
         return self
 
-    def build(self, name: str) -> SalesGroup:
-        group = SalesGroup(name)
+    def build(self) -> SalesGroup:
+        group = SalesGroup(self._name)
 
         for child in self._children:
             group.add(child)
@@ -112,10 +117,8 @@ if __name__ == "__main__":
     # Uses a nested/recursive builder pattern with lambdas. Each lambda receives
     # an isolated sub-builder scoped strictly to that branch. This eliminates the need
     # for mutable traversal state (_currentNode) or navigation methods (e.g., up()).
-    builder = SalesGroupBuilder()
-
     organization = (
-        builder
+        SalesGroupBuilder.named("Headquarters")
         .add_agent("CEO", 0)
         .add_group(
             "Tehran Branch",
@@ -147,7 +150,7 @@ if __name__ == "__main__":
                 .add_agent("Zahra", 200)
             ),
         )
-        .build("Headquarters")
+        .build()
     )
 
     print(f"Total Commission: {organization.get_commission()}")
