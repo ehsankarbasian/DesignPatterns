@@ -1,5 +1,5 @@
 """
-Nested Builder example for a Composite sales organization.
+Nested Builder and Template Prototype example for a Composite sales organization.
 
 Exercise statement:
 
@@ -13,16 +13,15 @@ groups.
 The commission of a sales group is the sum of the commissions of all its
 children.
 
-The builder must support creating nested groups without maintaining a
-mutable current node and without requiring navigation methods such as
-up() or add_to_parent().
-
-Nested groups are created by passing a callback to add_group(). The
-callback receives a new builder that is scoped to the nested group.
+The builder supports:
+1. Scoped nested group creation using closures/callbacks (leveraging the call stack).
+2. Attaching pre-configured/reusable subtrees.
+3. Prototype cloning (with_name) to reuse builder templates across multiple branches.
 """
 
 from __future__ import annotations
 
+import copy
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 
@@ -70,6 +69,12 @@ class SalesGroupBuilder:
     def named(cls, name: str) -> SalesGroupBuilder:
         return cls(name)
 
+    def with_name(self, new_name: str) -> SalesGroupBuilder:
+        """Clone the builder configuration as a template under a new identity."""
+        cloned_builder = copy.deepcopy(self)
+        cloned_builder._name = new_name
+        return cloned_builder
+
     def add_agent(
         self,
         name: str,
@@ -93,9 +98,8 @@ class SalesGroupBuilder:
 
     def add_group_builder(
         self,
-        builder: "SalesGroupBuilder",
+        builder: SalesGroupBuilder,
     ) -> SalesGroupBuilder:
-        # Attach a pre-configured (reusable) sub-tree built elsewhere.
         self._children.append(builder.build())
         return self
 
@@ -109,13 +113,14 @@ class SalesGroupBuilder:
 
 
 if __name__ == "__main__":
-    # Reusable / external builder (built outside of the main tree definition)
-    tabriz_branch_builder = (
-        SalesGroupBuilder.named("Tabriz Branch")
+    # 1. Prototype / Template Builder: Standard regional branch layout
+    standard_branch_template = (
+        SalesGroupBuilder.named("Standard Template")
         .add_agent("Regional Manager", 300)
         .add_agent("Local Agent", 200)
     )
 
+    # 2. Main Tree construction combining Inline Lambdas and Template Clones
     organization = (
         SalesGroupBuilder.named("Headquarters")
         .add_agent("CEO", 0)
@@ -141,7 +146,8 @@ if __name__ == "__main__":
                 )
             ),
         )
-        .add_group_builder(tabriz_branch_builder)
+        .add_group_builder(standard_branch_template.with_name("Tabriz Branch"))
+        .add_group_builder(standard_branch_template.with_name("Shiraz Branch"))
         .build()
     )
 
