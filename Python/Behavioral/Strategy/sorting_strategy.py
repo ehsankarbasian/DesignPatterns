@@ -5,6 +5,11 @@ Goal of this module:
 - Keep the example simple and educational.
 - Still demonstrate the real "Context" role (it can choose a strategy).
 - Strategies are stateless so we can safely reuse shared instances (flyweight-like).
+
+Architectural note (intentional deviation from pure GoF):
+- In the pure GoF form, the client selects and injects the strategy.
+- Here, the context performs adaptive selection based on input size.
+  The client can still override the strategy explicitly.
 """
 
 from __future__ import annotations
@@ -39,7 +44,14 @@ class InsertionSortStrategy(SortStrategyInterface[T]):
 
 
 class QuickSortStrategy(SortStrategyInterface[T]):
-    """A decent general-purpose in-memory sort for medium-size collections."""
+    """
+    A decent general-purpose in-memory sort for medium-size collections.
+
+    Trade-off (intentional simplification):
+    - Pivot selection is always the LAST element. On (nearly) sorted input this may
+      degrade to O(n^2). Production-grade quicksort usually randomizes the pivot
+      or uses median-of-three. We keep this version for clarity.
+    """
 
     def sort(self, data: Sequence[T]) -> list[T]:
         items = list(data)
@@ -100,15 +112,19 @@ class SortingContext(Generic[T]):
     Context:
     - Client calls `sort()`.
     - If no strategy is explicitly forced, the context chooses one based on input size.
+
+    Notes:
+    - Thresholds are educational and intentionally simple (not benchmark-based).
+    - Selection is based only on input size (not on "sortedness" of the data).
     """
 
     SMALL_THRESHOLD = 10
     MEDIUM_THRESHOLD = 1000
 
     # Shared stateless strategies (safe to reuse across contexts)
-    _INSERTION: SortStrategyInterface[T] = InsertionSortStrategy()
-    _QUICK: SortStrategyInterface[T] = QuickSortStrategy()
-    _MERGE: SortStrategyInterface[T] = MergeSortStrategy()
+    _INSERTION_SORT_STRATEGY: SortStrategyInterface[T] = InsertionSortStrategy()
+    _QUICK_SORT_STRATEGY: SortStrategyInterface[T] = QuickSortStrategy()
+    _MERGE_SORT_STRATEGY: SortStrategyInterface[T] = MergeSortStrategy()
 
     def __init__(self, strategy: SortStrategyInterface[T] | None = None) -> None:
         self._strategy = strategy
@@ -124,10 +140,10 @@ class SortingContext(Generic[T]):
     def _choose_strategy(self, size: int) -> SortStrategyInterface[T]:
         # Context encapsulates the selection logic (the key point of this example).
         if size <= self.SMALL_THRESHOLD:
-            return self._INSERTION
+            return self._INSERTION_SORT_STRATEGY
         if size <= self.MEDIUM_THRESHOLD:
-            return self._QUICK
-        return self._MERGE
+            return self._QUICK_SORT_STRATEGY
+        return self._MERGE_SORT_STRATEGY
 
     def sort(self, data: Sequence[T]) -> list[T]:
         selected = self._strategy or self._choose_strategy(len(data))
@@ -135,8 +151,8 @@ class SortingContext(Generic[T]):
 
 
 if __name__ == "__main__":
-    ctx = SortingContext[int]()  # adaptive
-    print(ctx.sort([5, 1, 4, 2, 3]))
+    context = SortingContext[int]()  # adaptive
+    print(context.sort([5, 1, 4, 2, 3]))
 
-    ctx.strategy = MergeSortStrategy()  # forced
-    print(ctx.sort([5, 1, 4, 2, 3]))
+    context.strategy = MergeSortStrategy()  # forced
+    print(context.sort([5, 1, 4, 2, 3]))
