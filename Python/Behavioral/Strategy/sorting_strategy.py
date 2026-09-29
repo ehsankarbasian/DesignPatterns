@@ -151,8 +151,8 @@ class SortingContext(Generic[T]):
 
 
 if __name__ == "__main__":
-    context = SortingContext[int]()  # adaptive
-    print(context.sort([5, 1, 4, 2, 3]))
+    sorting_context = SortingContext[int]()  # adaptive
+    print(sorting_context.sort([5, 1, 4, 2, 3]))
 
-    context.strategy = MergeSortStrategy()  # forced
-    print(context.sort([5, 1, 4, 2, 3]))
+    sorting_context.strategy = MergeSortStrategy()  # forced
+    print(sorting_context.sort([5, 1, 4, 2, 3]))
