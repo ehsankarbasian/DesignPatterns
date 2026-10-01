@@ -6,24 +6,29 @@ Design goal:
 Key decisions:
     1. Structural contract: Define DiscountStrategy as a Protocol with __call__.
     2. Closures for parameterized logic: Higher-order functions generate dynamic strategies.
-    3. Context invariance: Order enforces monetary rounding and clamping independently.
+    3. Domain invariants in dataclasses: Enforce invariants in __post_init__ of frozen dataclasses
+       (DDD-aligned; Value Object-like validation at construction time).
+    4. Context invariance: Order enforces monetary rounding and clamping independently.
 
 Trade-offs:
     - Best suited for pure, stateless, mathematical algorithms.
     - Not suitable for enterprise architectures requiring nominal typing (ABC), internal mutable state, or multi-method lifecycles.
-    - Protocol verifies callability structurally, but runtime signature enforcement requires static analysis (mypy).
+    - Protocol verifies callability structurally via @runtime_checkable, but runtime signature enforcement requires static analysis (mypy).
+    - Accepting float in quantize_money is a convenience trade-off; strict monetary domains should exclusively use Decimal or str.
 """
 
 from __future__ import annotations
 from dataclasses import dataclass
 from decimal import Decimal, ROUND_HALF_UP
-from typing import Callable, Protocol, Sequence, runtime_checkable
+from typing import Protocol, Sequence, runtime_checkable
 
 PENNY = Decimal("0.01")
 
 
 def quantize_money(value: str | float | int | Decimal) -> Decimal:
-    """Format and round monetary amounts to two decimal places."""
+    """
+    Format and round monetary amounts to two decimal places.
+    """
 
     return Decimal(str(value)).quantize(PENNY, rounding=ROUND_HALF_UP)
 
@@ -32,7 +37,12 @@ def quantize_money(value: str | float | int | Decimal) -> Decimal:
 
 @dataclass(frozen=True)
 class OrderItem:
-    """Immutable order line item."""
+    """
+    Immutable order line item.
+
+    Domain invariants are strictly enforced in __post_init__ at construction time
+    to prevent invalid domain state (DDD Value Object semantic).
+    """
 
     sku: str
     unit_price: Decimal
@@ -53,20 +63,23 @@ class OrderItem:
 
 @runtime_checkable
 class DiscountStrategy(Protocol):
-    """Callable structural protocol for stateless discount calculation."""
+    """
+    Callable structural protocol for stateless discount calculation.
+
+    runtime_checkable allows structural isinstance checks, but full signature validation
+    is deferred to static type analysis (mypy).
+    """
 
     def __call__(self, gross_total: Decimal, item_count: int, loyalty_tier: int) -> Decimal:
         ...
 
 
-# Type alias
-DiscountFunction = Callable[[Decimal, int, int], Decimal]
-
-
 # Concrete strategies
 
 def flat_rate_discount(gross_total: Decimal, item_count: int, loyalty_tier: int) -> Decimal:
-    """Stateless pure function strategy: 10.00 discount for orders >= 100.00."""
+    """
+    Stateless pure function strategy: 10.00 discount for orders >= 100.00.
+    """
 
     if gross_total >= Decimal("100.00"):
         return quantize_money("10.00")
@@ -74,7 +87,9 @@ def flat_rate_discount(gross_total: Decimal, item_count: int, loyalty_tier: int)
 
 
 def percentage_discount_factory(rate: Decimal) -> DiscountStrategy:
-    """Higher-order factory closure for parameterized percentage discounts."""
+    """
+    Higher-order factory closure for parameterized percentage discounts.
+    """
 
     if not (Decimal("0") <= rate <= Decimal("1.0")):
         raise ValueError(f"Discount rate must be between 0.0 and 1.0: {rate}")
@@ -86,7 +101,9 @@ def percentage_discount_factory(rate: Decimal) -> DiscountStrategy:
 
 
 def loyalty_tiered_discount(gross_total: Decimal, item_count: int, loyalty_tier: int) -> Decimal:
-    """Stateless pure function strategy: Tiered discount based on customer loyalty."""
+    """
+    Stateless pure function strategy: Tiered discount based on customer loyalty.
+    """
 
     if loyalty_tier <= 0:
         return Decimal("0.00")
@@ -99,7 +116,9 @@ def loyalty_tiered_discount(gross_total: Decimal, item_count: int, loyalty_tier:
 
 @dataclass(frozen=True)
 class Order:
-    """Context executing stateless discount callables and guarding domain invariants."""
+    """
+    Context executing stateless discount callables and guarding domain invariants.
+    """
 
     items: tuple[OrderItem, ...]
     loyalty_tier: int = 0
@@ -119,7 +138,9 @@ class Order:
         return sum(item.quantity for item in self.items)
 
     def calculate_discount(self, strategy: DiscountStrategy) -> Decimal:
-        """Execute strategy callable with defensive financial invariant guards."""
+        """
+        Execute strategy callable with defensive financial invariant guards.
+        """
 
         if not callable(strategy):
             raise TypeError("Strategy must be a callable.")
@@ -128,7 +149,9 @@ class Order:
         return clamped_discount.quantize(PENNY, rounding=ROUND_HALF_UP)
 
     def net_total(self, strategy: DiscountStrategy) -> Decimal:
-        """Calculate final net amount after applying discount."""
+        """
+        Calculate final net amount after applying discount.
+        """
 
         return (self.gross_total - self.calculate_discount(strategy)).quantize(PENNY, rounding=ROUND_HALF_UP)
 
