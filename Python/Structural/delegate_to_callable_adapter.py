@@ -79,6 +79,9 @@ class ExportClient:
         return "\n".join(parts)
 
 
+# Initial approach: Delegate Object Adapter
+# Encapsulates transformation within explicit dedicated adapter instances.
+
 # Delegate Adapter Interface
 class ExportRowDelegateAdapterInterface(ABC):
     """
@@ -159,6 +162,9 @@ class DelegatingExportService:
         return self._client.export(rows)
 
 
+# Refactoring starting point: Parameterized Callable Adapter
+# Replaces boilerplate delegate adapter classes with pure, first-class callables.
+
 # Parameterized Callable type alias
 RecordFormatter = Callable[[ExportRowSourceInterface], ExportRow]
 
@@ -215,6 +221,8 @@ if __name__ == "__main__":
     client = ExportClient()
     sources = _build_sources()
 
+    # Delegate object approach: Instantiate explicit adapter classes per stream.
+    # Justified when transformations require state, caching, or custom configuration.
     delegating_sensor = DelegatingExportService(client, SensorReadingDelegateAdapter())
     delegating_log = DelegatingExportService(client, LogEntryDelegateAdapter())
 
@@ -224,6 +232,8 @@ if __name__ == "__main__":
     out_sensor_delegate = delegating_sensor.export(sensor_only)
     out_log_delegate = delegating_log.export(log_only)
 
+    # Parameterized callable approach: Pass a pure function eliminating boilerplate classes.
+    # Refactored for stateless transformations where behavior injection suffices.
     callable_service = CallableExportService(client, default_export_row_formatter)
     out_all_callable = callable_service.export(sources)
 
@@ -236,6 +246,8 @@ if __name__ == "__main__":
     assert "sensor:A1\ttemp_c=21.2; humidity_pct=44.9" in out_all_callable
     assert "log:api:ERROR\tupstream timeout" in out_all_callable
 
+    # Parameterized callable variant using an inline lambda expression.
+    # Demonstrates maximum brevity and flexible on-the-fly client adaptation.
     out_all_callable_lambda = CallableExportService(
         client,
         lambda src: ExportRow(key=src.export_key(), summary=src.export_summary()),
