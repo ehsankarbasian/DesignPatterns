@@ -150,6 +150,38 @@ class DiscountStrategyInterface(ABC):
         raise NotImplementedError
 
 
+# Concrete Strategy / Null Object
+
+class NoDiscountStrategy(DiscountStrategyInterface):
+    """
+    Null Object Pattern: a concrete Strategy that represents "no discount".
+
+    Design goal
+    Provide a valid default strategy so the Basket context can avoid conditional branching
+    (e.g., checking for None) while still honoring the Strategy interface.
+
+    Key decisions
+    - Implement as a concrete DiscountStrategyInterface that always returns Decimal("0").
+
+    When justified
+    - When "no discount" is a valid domain state.
+    - When you want to remove if/else checks from the context.
+
+    When unnecessary
+    - When missing strategy is an exceptional state and should fail fast.
+
+    Trade-offs
+    Benefits:
+    - Eliminates None checks and keeps the context polymorphic.
+    Costs:
+    - Introduces one more class (minor ceremony).
+    """
+
+    # TODO: Consider making this a singleton (or using a module-level shared instance) to avoid repeated instantiation.
+    def calculate_discount(self, context: GrossPricedContextInterface) -> Decimal:
+        return Decimal("0")
+
+
 # Concrete Context
 
 class Basket(LoyaltyEligibleBasketContextInterface, SkuAwareBasketContextInterface):
@@ -189,7 +221,7 @@ class Basket(LoyaltyEligibleBasketContextInterface, SkuAwareBasketContextInterfa
 
         return sum((item.gross_amount for item in self._items), start=Decimal("0"))
 
-    def discounted_amount(self, strategy: DiscountStrategyInterface) -> Decimal:
+    def discounted_amount(self, strategy: DiscountStrategyInterface = NoDiscountStrategy()) -> Decimal:
         """
         Applies a pricing strategy and enforces core financial invariants on the result.
         """
