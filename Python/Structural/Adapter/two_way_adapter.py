@@ -28,7 +28,15 @@ Trade-offs:
   interact with the same adapted object seamlessly.
 - Cons: Increases interface surface area; requires maintaining consistency across
   both representations upon state mutation.
+
+Implementation Note: Two-Way Adapter Mechanics
+    A Two-Way Adapter may leverage either Class (Multiple Inheritance) or Object 
+    (Composition) approaches, maintaining the trade-offs documented in the one-way 
+    adapter modules. This implementation utilizes Object-Composition to achieve 
+    bidirectional interface conformance while avoiding the complexity of 
+    multiple inheritance.
 """
+
 
 from __future__ import annotations
 
