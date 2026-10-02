@@ -150,34 +150,63 @@ class DiscountStrategyInterface(ABC):
         raise NotImplementedError
 
 
-# Concrete Strategy / Null Object
+# Utility Metaclass for Concrete Singletons
 
-class NoDiscountStrategy(DiscountStrategyInterface):
+class SingletonPattern(type):
     """
-    Null Object Pattern: a concrete Strategy that represents "no discount".
+    Metaclass that enforces a strict singleton pattern on concrete classes.
 
     Design goal
-    Provide a valid default strategy so the Basket context can avoid conditional branching
-    (e.g., checking for None) while still honoring the Strategy interface.
+    Intercept class instantiation via `__call__` and ensure that only a single instance
+    exists per class across the entire application lifecycle.
+    """
+
+    _instances: dict[type, object] = {}
+
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            instance = super().__call__(*args, **kwargs)
+            cls._instances[cls] = instance
+        return cls._instances[cls]
+
+
+# Concrete Strategy / Null Object / Singleton
+
+class NoDiscountStrategy(DiscountStrategyInterface, metaclass=SingletonPattern):
+    """
+    Null Object Pattern combined with Singleton Pattern: a concrete Strategy representing "no discount".
+
+    Design goal
+    Provide a guaranteed single shared instance so that default arguments and multiple explicit
+    instantiations do not create redundant objects, while keeping the context polymorphic and branch-free.
 
     Key decisions
-    - Implement as a concrete DiscountStrategyInterface that always returns Decimal("0").
+    - Implemented using the SingletonPattern metaclass to intercept `__call__`.
+    - Always returns Decimal("0") in `calculate_discount`.
 
     When justified
-    - When "no discount" is a valid domain state.
-    - When you want to remove if/else checks from the context.
+    - When the strategy is completely stateless, immutable, and represents a universal domain null state.
+    - When frequently used as a default argument across multiple contexts, guaranteeing strict
+      identity equality (`is` check) and eliminating repetitive memory allocations.
 
     When unnecessary
-    - When missing strategy is an exceptional state and should fail fast.
+    - When a class holds mutable state, depends on runtime parameters, or requires distinct instances
+      per context.
 
     Trade-offs
     Benefits:
-    - Eliminates None checks and keeps the context polymorphic.
+    - Absolute guarantee of a single instance globally; prevents accidental redundant allocations.
+    - Safe and optimized for default arguments and memory footprints.
     Costs:
-    - Introduces one more class (minor ceremony).
+    - Introduces metaclass complexity and global shared state lifecycle.
+
+    Python Internals & Default Arguments Analysis
+    In Python, default argument expressions (e.g., `strategy = NoDiscountStrategy()`) are evaluated
+    at function definition time. However, relying solely on default evaluation can be fragile if instances
+    are created explicitly elsewhere in code. Applying the Singleton metaclass ensures that *wherever* and
+    *whenever* `NoDiscountStrategy()` is called, the exact same memory address and instance are returned.
     """
 
-    # TODO: Consider making this a singleton (or using a module-level shared instance) to avoid repeated instantiation.
     def calculate_discount(self, context: GrossPricedContextInterface) -> Decimal:
         return Decimal("0")
 
@@ -325,7 +354,13 @@ if __name__ == "__main__":
         fixed_discount_amount=Decimal("7.50"),
     )
 
+    # Verify Singleton behavior for NoDiscountStrategy
+    s1 = NoDiscountStrategy()
+    s2 = NoDiscountStrategy()
+    assert s1 is s2, "Singleton violation: NoDiscountStrategy instances are not identical!"
+
     print("Gross amount:", basket.gross_amount)
+    print("Discounted amount (default / NoDiscountSingleton):", basket.discounted_amount())
     print("Discounted amount (percentage):", basket.discounted_amount(percentage_strategy))
     print("Discounted amount (loyalty):", basket.discounted_amount(loyalty_strategy))
     print("Discounted amount (sku fixed):", basket.discounted_amount(sku_strategy))
