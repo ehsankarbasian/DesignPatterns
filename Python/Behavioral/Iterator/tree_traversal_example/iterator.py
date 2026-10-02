@@ -1,21 +1,23 @@
 from __future__ import annotations
-from typing import Any, TYPE_CHECKING
 
 from abc import abstractmethod
 from collections.abc import Iterable, Iterator
+from typing import Any, Callable, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from binary_tree import BinaryTree
+    from binary_tree import BinaryTree, Node
+
+from order_strategy import REVERSE_STRATEGY_MAP
 
 
 class AbstractBaseIterable(Iterable):
-    
+
     @property
     @abstractmethod
-    def iterate_strategy(self) -> function:
+    def iterate_strategy(self) -> Callable[[Optional[Node]], Iterator[Node]]:
         pass
-    
-    def __getitem__(self, index: int):
+
+    def __getitem__(self, index: int) -> Node:
         return self._collection[index]
 
     def __iter__(self) -> BinaryTreeIterator:
@@ -26,29 +28,27 @@ class AbstractBaseIterable(Iterable):
 
 
 class BinaryTreeIterator(Iterator):
-    _position: int = None
-    _reverse: bool = False
 
     def __init__(self, collection: BinaryTree, reverse: bool = False):
         self._collection = collection
         self._reverse = reverse
-        self._sorted_items = None  # Will be set on first __next__ call
-        self._position = 0
+        self._generator: Optional[Iterator[Node]] = None
 
-    def __next__(self) -> Any:
+    def __iter__(self) -> BinaryTreeIterator:
+        return self
+
+    def __next__(self) -> Node:
         tree = self._collection
-        if not hasattr(tree, '_iterate_strategy'):
-            raise Exception('Set iterate strategy before iterating')
-        
-        # Sorting happens only when the first items is actually requested.
-        if self._sorted_items is None:
-            root = tree._collection[0]
-            self._sorted_items = tree.iterate_strategy(root)
-            if self._reverse:
-                self._sorted_items = list(reversed(self._sorted_items))
+        if not hasattr(tree, "_iterate_strategy"):
+            raise ValueError("Set iterate strategy before iterating")
 
-        if self._position >= len(self._sorted_items):
-            raise StopIteration()
-        value = self._sorted_items[self._position]
-        self._position += 1
-        return value
+        if self._generator is None:
+            root = tree.root if hasattr(tree, "root") else tree._collection[0]
+            strategy = tree.iterate_strategy
+
+            if self._reverse:
+                strategy = REVERSE_STRATEGY_MAP.get(strategy, strategy)
+
+            self._generator = strategy(root)
+
+        return next(self._generator)
