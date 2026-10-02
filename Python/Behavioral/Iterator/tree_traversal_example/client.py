@@ -1,7 +1,20 @@
+"""
+Design goal:
+    Demonstrate client interaction with strategy-driven lazy tree traversal and reverse iteration.
+
+Key decisions:
+    Construct sample hierarchical binary tree structure.
+    Dynamically switch concrete traversal strategies and iterate using standard iteration protocol and reverse iterator.
+
+Trade-offs:
+    Direct strategy reassignment on the collection mutates traversal state for subsequent iteration loops.
+"""
+
 from binary_tree import BinaryTree
 from order_strategy import in_order, post_order, pre_order
 
 
+# Client
 if __name__ == "__main__":
     collection = BinaryTree()
     root = collection.root

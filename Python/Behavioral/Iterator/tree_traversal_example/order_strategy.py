@@ -1,11 +1,30 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
-from typing import Optional, TYPE_CHECKING
+from typing import Callable, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from binary_tree import Node
 
+"""
+Design goal:
+    Provide a collection of stateless, lazy-evaluating traversal strategies for binary trees.
+
+Key decisions:
+    Use generator functions to achieve O(h) space complexity during traversal.
+    Define strategies as standalone callables that can be injected into BinaryTree.
+
+Trade-offs:
+    Functional strategies offer extreme simplicity and low overhead, but prevent 
+    storing internal traversal state (e.g., node path tracking) without external closures.
+"""
+
+
+# Type alias / Strategy Interface
+TraversalStrategy = Callable[[Optional["Node"]], Iterator["Node"]]
+
+
+# Concrete Strategies
 
 def pre_order(node: Optional[Node]) -> Iterator[Node]:
     if node is None:
@@ -55,7 +74,7 @@ def post_order_reverse(node: Optional[Node]) -> Iterator[Node]:
     yield from post_order_reverse(node.left_child)
 
 
-REVERSE_STRATEGY_MAP = {
+REVERSE_STRATEGY_MAP: dict[TraversalStrategy, TraversalStrategy] = {
     pre_order: pre_order_reverse,
     in_order: in_order_reverse,
     post_order: post_order_reverse,

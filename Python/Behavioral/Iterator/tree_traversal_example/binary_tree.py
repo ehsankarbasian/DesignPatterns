@@ -6,9 +6,21 @@ from typing import Callable, Optional
 from iterator import AbstractBaseIterable
 
 
+# Element (Node)
 class Node:
+    """
+    Design goal:
+        Represent a minimal pointer-based binary tree node for lazy traversal.
 
-    def __init__(self, node_name: str, parent: Optional[Node] = None):
+    Key decisions:
+        Use Optional[Node] for explicit nullable parent and child links.
+        Enforce single-assignment for children to prevent silent graph rewiring.
+
+    Trade-offs:
+        Immutable child links prevent mutation bugs but require tree reconstruction for dynamic re-balancing.
+    """
+
+    def __init__(self, node_name: str, parent: Optional[Node] = None) -> None:
         self._name: str = node_name
         self._parent: Optional[Node] = parent
         self._left_child: Optional[Node] = None
@@ -27,11 +39,15 @@ class Node:
         return self._right_child
 
     def _add_left_child(self, left_child: Node) -> None:
+        """Attach a left child; raises ValueError if already present."""
+
         if self._left_child is not None:
             raise ValueError("Left child already exists")
         self._left_child = left_child
 
     def _add_right_child(self, right_child: Node) -> None:
+        """Attach a right child; raises ValueError if already present."""
+
         if self._right_child is not None:
             raise ValueError("Right child already exists")
         self._right_child = right_child
@@ -43,9 +59,21 @@ class Node:
         return f"Node(name={self._name!r})"
 
 
+# Concrete Aggregate / Strategy Context
 class BinaryTree(AbstractBaseIterable):
+    """
+    Design goal:
+        Provide a tree container that delegates traversal to an injected iteration strategy.
 
-    def __init__(self, root_name: str = "root"):
+    Key decisions:
+        Maintain a purely pointer-based hierarchy starting at root without cached node lists.
+        Require explicit configuration of iterate_strategy before iteration.
+
+    Trade-offs:
+        Strategy indirection enables interchangeable lazy traversals but requires prior setup by client.
+    """
+
+    def __init__(self, root_name: str = "root") -> None:
         self._root: Node = Node(node_name=root_name)
         self._iterate_strategy: Optional[Callable[[Optional[Node]], Iterator[Node]]] = None
 
