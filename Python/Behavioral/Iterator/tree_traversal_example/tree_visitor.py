@@ -2,24 +2,18 @@
 Module-level architecture for expression tree traversal and heterogeneous operations.
 
 Design goal:
-Establish a clear separation between structural traversal (Iterator) and
-type-specific business operations (Visitor) across an arithmetic expression
-composite hierarchy, avoiding fat node interfaces and scattered operation logic.
+    Establish a clear separation between structural traversal (Iterator) and
+    type-specific operations (Visitor) across an arithmetic expression composite
+    hierarchy, avoiding fat node interfaces.
 
 Key decisions:
-- Delegate element navigation to dedicated tree iterators to isolate queue and
-  stack traversal mechanics from semantic processing.
-- Employ the Visitor pattern with double dispatch to encapsulate multiple
-  disparate algorithms (such as decimal evaluation, parenthesized formatting,
-  and algebraic constant folding) outside the composite nodes.
-- Retain lightweight composite components focused purely on syntax structure
-  rather than embedding numerous domain-specific reduction methods.
+    - Employ the Visitor pattern with double dispatch to encapsulate multiple
+      disparate algorithms outside the composite nodes.
+    - Retain lightweight composite components focused purely on syntax structure.
 
 Trade-offs:
-- Simplifies adding new analytical and transformation passes without modifying
-  the AST hierarchy.
-- Increases system fragility when introducing new expression node variants, as
-  all concrete visitors must be updated to satisfy the expanded visitor interface.
+    - Simplifies adding new tree passes without modifying composite classes.
+    - Adding new node types forces updating all concrete visitor implementations.
 """
 
 from abc import ABC, abstractmethod
@@ -35,17 +29,11 @@ class ExpressionVisitorInterface(ABC, Generic[T]):
     Pure abstract visitor interface defining double dispatch methods for expression nodes.
 
     Design goal:
-    Provide an abstract contract for heterogeneous operations across all concrete
-    variants of the expression composite hierarchy without type mutations.
+        Provide a uniform visitor contract across all expression composite variants.
 
     Key decisions:
-    - Utilize a generic type parameter T to allow concrete visitors to specify
-      their distinct computation return types (e.g., Decimal, str, ExpressionNodeInterface).
-    - Expose explicit visit methods for each concrete expression node variant.
-
-    Trade-offs:
-    - Adding a new node class to the composite structure forces updating all
-      implementations of this visitor interface.
+        - Utilize generic parameter T to allow concrete visitors to define specific return types.
+        - Expose explicit visit methods for each concrete expression node variant.
     """
 
     pass
@@ -65,17 +53,11 @@ class ExpressionNodeInterface(ABC):
     Pure abstract component interface representing an expression tree element.
 
     Design goal:
-    Provide a uniform structural interface for all tree elements while enabling
-    extensible external operations via double dispatch.
+        Provide a uniform structural interface for all tree elements while enabling
+        extensible external operations via double dispatch.
 
     Key decisions:
-    - Enforce accept signature receiving a visitor interface to decouple nodes
-      from concrete visitor implementations.
-    - Avoid polluting tree nodes with evaluation or transformation methods.
-
-    Trade-offs:
-    - Changes to node types necessitate updating the accept contract across all
-      derived elements and visitor protocols.
+        - Enforce an accept signature to decouple nodes from concrete visitors.
     """
 
     pass
@@ -87,22 +69,9 @@ class ExpressionNodeInterface(ABC):
 
 # Leaf
 class NumberLiteralNode(ExpressionNodeInterface):
-    """
-    Terminal leaf node holding a constant decimal value.
+    """Terminal leaf node holding a constant decimal value."""
 
-    Design goal:
-    Represent immutable numeric constants within the arithmetic expression
-    without evaluating semantics or formatting concerns.
-
-    Key decisions:
-    - Enforce Decimal type for precision and compliance with exact numerical invariants.
-    - Implement accept by calling visit_literal on the supplied visitor.
-
-    Trade-offs:
-    - Requires upfront conversion of numeric inputs to Decimal instances.
-    """
-
-    def init(self, value: Decimal) -> None:
+    def __init__(self, value: Decimal) -> None:
         self._value: Decimal = value
 
     @property
@@ -112,31 +81,17 @@ class NumberLiteralNode(ExpressionNodeInterface):
     def accept(self, visitor: ExpressionVisitorInterface[T]) -> T:
         return visitor.visit_literal(self)
 
-    def repr(self) -> str:
+    def __repr__(self) -> str:
         return f"NumberLiteralNode(value={self._value})"
 
 
 # Composite
 class OperatorNode(ExpressionNodeInterface):
-    """
-    Composite node representing an arithmetic operation over two child expressions.
-
-    Design goal:
-    Model arithmetic operations as composite branches connecting left and
-    right operand subtrees.
-
-    Key decisions:
-    - Constrain operators to fundamental arithmetic symbols ('+', '-', '*', '/').
-    - Expose operand subtrees as read-only properties to preserve composite structural integrity.
-    - Implement accept by calling visit_operator on the supplied visitor.
-
-    Trade-offs:
-    - Limited strictly to two operands; n-ary expressions require chained nesting.
-    """
+    """Composite node representing an arithmetic operation over two child expressions."""
 
     SUPPORTED_OPERATORS: frozenset[str] = frozenset({"+", "-", "*", "/"})
 
-    def init(
+    def __init__(
         self,
         operator: str,
         left: ExpressionNodeInterface,
@@ -165,7 +120,7 @@ class OperatorNode(ExpressionNodeInterface):
     def accept(self, visitor: ExpressionVisitorInterface[T]) -> T:
         return visitor.visit_operator(self)
 
-    def repr(self) -> str:
+    def __repr__(self) -> str:
         return (
             f"OperatorNode(operator='{self._operator}', "
             f"left={self._left}, right={self._right})"
@@ -174,21 +129,7 @@ class OperatorNode(ExpressionNodeInterface):
 
 # Concrete Visitor: Evaluation
 class EvaluationVisitor(ExpressionVisitorInterface[Decimal]):
-    """
-    Concrete visitor computing the exact decimal evaluation of an expression tree.
-
-    Design goal:
-    Evaluate hierarchical arithmetic expressions to a single Decimal value using
-    post-order double dispatch traversal without mutating node representations.
-
-    Key decisions:
-    - Specialize generic parameter T to Decimal for financial arithmetic precision.
-    - Recursively dispatch evaluation through operand accept calls to preserve structural encapsulation.
-    - Explicitly guard against division by zero to guarantee deterministic numerical exceptions.
-
-    Trade-offs:
-    - Recursive evaluation stack depth scales with tree height, requiring balanced trees for deep expressions.
-    """
+    """Calculates the exact decimal evaluation of an expression tree via post-order dispatch."""
 
     def visit_literal(self, node: NumberLiteralNode) -> Decimal:
         return node.value
@@ -214,20 +155,7 @@ class EvaluationVisitor(ExpressionVisitorInterface[Decimal]):
 
 # Concrete Visitor: Infix String Representation
 class InfixStringVisitor(ExpressionVisitorInterface[str]):
-    """
-    Concrete visitor generating a fully parenthesized infix string representation of the tree.
-
-    Design goal:
-    Produce an unambiguous string representation of an expression tree that explicitly
-    reflects evaluation precedence through nested parentheses.
-
-    Key decisions:
-    - Specialize generic parameter T to str for textual formatting operations.
-    - Wrap binary composite operations in parentheses to maintain structural precedence visually.
-    - Format literal numeric values directly to canonical string representations.
-Trade-offs:
-    - Fully parenthesized output introduces redundant parentheses for associative chains.
-    """
+    """Produces a fully parenthesized infix string representation from an expression tree."""
 
     def visit_literal(self, node: NumberLiteralNode) -> str:
         return str(node.value)
