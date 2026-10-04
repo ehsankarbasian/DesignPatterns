@@ -31,7 +31,8 @@ T = TypeVar("T")
 
 # Visitor Interface
 class ExpressionVisitorInterface(ABC, Generic[T]):
-    """Pure abstract visitor interface defining double dispatch methods for expression nodes.
+    """
+    Pure abstract visitor interface defining double dispatch methods for expression nodes.
 
     Design goal:
     Provide an abstract contract for heterogeneous operations across all concrete
@@ -39,7 +40,7 @@ class ExpressionVisitorInterface(ABC, Generic[T]):
 
     Key decisions:
     - Utilize a generic type parameter T to allow concrete visitors to specify
-      their distinct computation return types (e.g., Decimal, str, AbstractExpressionNode).
+      their distinct computation return types (e.g., Decimal, str, ExpressionNodeInterface).
     - Expose explicit visit methods for each concrete expression node variant.
 
     Trade-offs:
@@ -56,9 +57,10 @@ class ExpressionVisitorInterface(ABC, Generic[T]):
         """Process an operator composite branch node."""
 
 
-# Component
-class AbstractExpressionNode(ABC):
-    """Abstract base component representing an expression tree element.
+# Component Interface
+class ExpressionNodeInterface(ABC):
+    """
+    Pure abstract component interface representing an expression tree element.
 
     Design goal:
     Provide a uniform structural interface for all tree elements while enabling
@@ -74,14 +76,17 @@ class AbstractExpressionNode(ABC):
       derived elements and visitor protocols.
     """
 
+    pass
+
     @abstractmethod
     def accept(self, visitor: ExpressionVisitorInterface[T]) -> T:
         """Accept an external visitor and dispatch to its type-specific method."""
 
 
 # Leaf
-class NumberLiteralNode(AbstractExpressionNode):
-    """Terminal leaf node holding a constant decimal value.
+class NumberLiteralNode(ExpressionNodeInterface):
+    """
+    Terminal leaf node holding a constant decimal value.
 
     Design goal:
     Represent immutable numeric constants within the arithmetic expression
@@ -110,8 +115,9 @@ class NumberLiteralNode(AbstractExpressionNode):
 
 
 # Composite
-class OperatorNode(AbstractExpressionNode):
-    """Composite node representing an arithmetic operation over two child expressions.
+class OperatorNode(ExpressionNodeInterface):
+    """
+    Composite node representing an arithmetic operation over two child expressions.
 
     Design goal:
     Model arithmetic operations as composite branches connecting left and
@@ -131,25 +137,27 @@ class OperatorNode(AbstractExpressionNode):
     def init(
         self,
         operator: str,
-        left: AbstractExpressionNode,
-        right: AbstractExpressionNode,
+        left: ExpressionNodeInterface,
+        right: ExpressionNodeInterface,
     ) -> None:
         if operator not in self.SUPPORTED_OPERATORS:
-            raise ValueError(f"Unsupported operator: {operator}. Expected one of {sorted(self.SUPPORTED_OPERATORS)}")
+            raise ValueError(
+                f"Unsupported operator: {operator}. Expected one of {sorted(self.SUPPORTED_OPERATORS)}"
+            )
         self._operator: str = operator
-        self._left: AbstractExpressionNode = left
-        self._right: AbstractExpressionNode = right
+        self._left: ExpressionNodeInterface = left
+        self._right: ExpressionNodeInterface = right
 
     @property
     def operator(self) -> str:
         return self._operator
 
     @property
-    def left(self) -> AbstractExpressionNode:
+    def left(self) -> ExpressionNodeInterface:
         return self._left
 
     @property
-    def right(self) -> AbstractExpressionNode:
+    def right(self) -> ExpressionNodeInterface:
         return self._right
 
     def accept(self, visitor: ExpressionVisitorInterface[T]) -> T:
@@ -160,3 +168,43 @@ class OperatorNode(AbstractExpressionNode):
             f"OperatorNode(operator='{self._operator}', "
             f"left={self._left}, right={self._right})"
         )
+
+
+# Concrete Visitor
+class EvaluationVisitor(ExpressionVisitorInterface[Decimal]):
+    """
+    Concrete visitor computing the exact decimal evaluation of an expression tree.
+
+    Design goal:
+    Evaluate hierarchical arithmetic expressions to a single Decimal value using
+    post-order double dispatch traversal without mutating node representations.
+
+    Key decisions:
+    - Specialize generic parameter T to Decimal for financial arithmetic precision.
+    - Recursively dispatch evaluation through operand accept calls to preserve structural encapsulation.
+    - Explicitly guard against division by zero to guarantee deterministic numerical exceptions.
+
+    Trade-offs:
+    - Recursive evaluation stack depth scales with tree height, requiring balanced trees for deep expressions.
+    """
+
+    def visit_literal(self, node: NumberLiteralNode) -> Decimal:
+        return node.value
+
+    def visit_operator(self, node: OperatorNode) -> Decimal:
+        left_value = node.left.accept(self)
+        right_value = node.right.accept(self)
+
+        operator = node.operator
+        if operator == "+":
+            return left_value + right_value
+        if operator == "-":
+            return left_value - right_value
+        if operator == "*":
+            return left_value * right_value
+        if operator == "/":
+            if right_value == Decimal("0"):
+                raise ZeroDivisionError("Division by zero encountered during tree evaluation.")
+            return left_value / right_value
+
+        raise ValueError(f"Unknown operator: {operator}")
