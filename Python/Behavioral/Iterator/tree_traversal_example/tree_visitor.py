@@ -1,5 +1,5 @@
 """
-Architecture for expression tree traversal and heterogeneous operations.
+Module-level architecture for expression tree traversal and heterogeneous operations.
 
 Design goal:
 Establish a clear separation between structural traversal (Iterator) and
@@ -24,14 +24,36 @@ Trade-offs:
 
 from abc import ABC, abstractmethod
 from decimal import Decimal
-from typing import TYPE_CHECKING, Any
+from typing import Generic, TypeVar
 
-if TYPE_CHECKING:
-    from typing import Protocol
+T = TypeVar("T")
 
-    class ExpressionVisitorProtocol(Protocol):
-        def visit_literal(self, node: "NumberLiteralNode") -> Any: ...
-        def visit_binary_operator(self, node: "BinaryOperatorNode") -> Any: ...
+
+# Visitor Interface
+class ExpressionVisitorInterface(ABC, Generic[T]):
+    """Pure abstract visitor interface defining double dispatch methods for expression nodes.
+
+    Design goal:
+    Provide an abstract contract for heterogeneous operations across all concrete
+    variants of the expression composite hierarchy without type mutations.
+
+    Key decisions:
+    - Utilize a generic type parameter T to allow concrete visitors to specify
+      their distinct computation return types (e.g., Decimal, str, AbstractExpressionNode).
+    - Expose explicit visit methods for each concrete expression node variant.
+
+    Trade-offs:
+    - Adding a new node class to the composite structure forces updating all
+      implementations of this visitor interface.
+    """
+
+    @abstractmethod
+    def visit_literal(self, node: "NumberLiteralNode") -> T:
+        """Process a numeric literal terminal leaf node."""
+
+    @abstractmethod
+    def visit_operator(self, node: "OperatorNode") -> T:
+        """Process an operator composite branch node."""
 
 
 # Component
@@ -43,7 +65,7 @@ class AbstractExpressionNode(ABC):
     extensible external operations via double dispatch.
 
     Key decisions:
-    - Enforce accept signature receiving a visitor protocol to decouple nodes
+    - Enforce accept signature receiving a visitor interface to decouple nodes
       from concrete visitor implementations.
     - Avoid polluting tree nodes with evaluation or transformation methods.
 
@@ -53,7 +75,7 @@ class AbstractExpressionNode(ABC):
     """
 
     @abstractmethod
-    def accept(self, visitor: "ExpressionVisitorProtocol") -> Any:
+    def accept(self, visitor: ExpressionVisitorInterface[T]) -> T:
         """Accept an external visitor and dispatch to its type-specific method."""
 
 
@@ -73,40 +95,40 @@ class NumberLiteralNode(AbstractExpressionNode):
     - Requires upfront conversion of numeric inputs to Decimal instances.
     """
 
-    def __init__(self, value: Decimal) -> None:
+    def init(self, value: Decimal) -> None:
         self._value: Decimal = value
 
     @property
     def value(self) -> Decimal:
         return self._value
 
-    def accept(self, visitor: "ExpressionVisitorProtocol") -> Any:
+    def accept(self, visitor: ExpressionVisitorInterface[T]) -> T:
         return visitor.visit_literal(self)
 
-    def __repr__(self) -> str:
+    def repr(self) -> str:
         return f"NumberLiteralNode(value={self._value})"
 
 
 # Composite
-class BinaryOperatorNode(AbstractExpressionNode):
-    """Composite node representing a binary operation over two child expressions.
+class OperatorNode(AbstractExpressionNode):
+    """Composite node representing an arithmetic operation over two child expressions.
 
     Design goal:
-    Model binary arithmetic operations as composite branches connecting left and
-    right subtrees.
+    Model arithmetic operations as composite branches connecting left and
+    right operand subtrees.
 
     Key decisions:
     - Constrain operators to fundamental arithmetic symbols ('+', '-', '*', '/').
-    - Expose subtrees as read-only properties to preserve composite structural integrity.
-    - Implement accept by calling visit_binary_operator on the supplied visitor.
+    - Expose operand subtrees as read-only properties to preserve composite structural integrity.
+    - Implement accept by calling visit_operator on the supplied visitor.
 
     Trade-offs:
-    - Limited strictly to binary operations; unary expressions require separate modeling.
+    - Limited strictly to two operands; n-ary expressions require chained nesting.
     """
 
     SUPPORTED_OPERATORS: frozenset[str] = frozenset({"+", "-", "*", "/"})
 
-    def __init__(
+    def init(
         self,
         operator: str,
         left: AbstractExpressionNode,
@@ -130,11 +152,11 @@ class BinaryOperatorNode(AbstractExpressionNode):
     def right(self) -> AbstractExpressionNode:
         return self._right
 
-    def accept(self, visitor: "ExpressionVisitorProtocol") -> Any:
-        return visitor.visit_binary_operator(self)
+    def accept(self, visitor: ExpressionVisitorInterface[T]) -> T:
+        return visitor.visit_operator(self)
 
-    def __repr__(self) -> str:
+    def repr(self) -> str:
         return (
-            f"BinaryOperatorNode(operator='{self._operator}', "
+            f"OperatorNode(operator='{self._operator}', "
             f"left={self._left}, right={self._right})"
         )
