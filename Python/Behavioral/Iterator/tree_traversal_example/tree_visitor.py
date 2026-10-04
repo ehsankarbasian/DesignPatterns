@@ -48,6 +48,8 @@ class ExpressionVisitorInterface(ABC, Generic[T]):
       implementations of this visitor interface.
     """
 
+    pass
+
     @abstractmethod
     def visit_literal(self, node: "NumberLiteralNode") -> T:
         """Process a numeric literal terminal leaf node."""
@@ -170,7 +172,7 @@ class OperatorNode(ExpressionNodeInterface):
         )
 
 
-# Concrete Visitor
+# Concrete Visitor: Evaluation
 class EvaluationVisitor(ExpressionVisitorInterface[Decimal]):
     """
     Concrete visitor computing the exact decimal evaluation of an expression tree.
@@ -208,3 +210,29 @@ class EvaluationVisitor(ExpressionVisitorInterface[Decimal]):
             return left_value / right_value
 
         raise ValueError(f"Unknown operator: {operator}")
+
+
+# Concrete Visitor: Infix String Representation
+class InfixStringVisitor(ExpressionVisitorInterface[str]):
+    """
+    Concrete visitor generating a fully parenthesized infix string representation of the tree.
+
+    Design goal:
+    Produce an unambiguous string representation of an expression tree that explicitly
+    reflects evaluation precedence through nested parentheses.
+
+    Key decisions:
+    - Specialize generic parameter T to str for textual formatting operations.
+    - Wrap binary composite operations in parentheses to maintain structural precedence visually.
+    - Format literal numeric values directly to canonical string representations.
+Trade-offs:
+    - Fully parenthesized output introduces redundant parentheses for associative chains.
+    """
+
+    def visit_literal(self, node: NumberLiteralNode) -> str:
+        return str(node.value)
+
+    def visit_operator(self, node: OperatorNode) -> str:
+        left_expr = node.left.accept(self)
+        right_expr = node.right.accept(self)
+        return f"({left_expr} {node.operator} {right_expr})"
