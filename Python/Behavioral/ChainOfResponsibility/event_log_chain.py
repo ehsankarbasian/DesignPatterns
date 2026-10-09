@@ -4,6 +4,8 @@ import re
 from typing import Optional, Pattern
 
 
+# Example from book: Clean Code in Python - Season 9
+
 class Event:
     
     # Shared regex pattern for all concrete events.
