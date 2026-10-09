@@ -10,7 +10,9 @@ class Event:
     Design goal:
         Process log lines along a chain using regex matching and Null Object termination.
     Key decisions:
-        Default successor to NullEvent to eliminate conditional successor verification.
+        Subclasses must define a class-level pattern to join the chain;
+        can_process is a classmethod because matching depends only on the pattern;
+        the default successor is NullEvent to eliminate conditional successor checks.
     Trade-offs:
         Requires regex evaluation before delegating processing down the chain.
     """
@@ -40,9 +42,6 @@ class Event:
 
     @classmethod
     def _parse_data(cls, logline: str) -> Dict[str, str]:
-        if cls.pattern is None:
-            return {}
-
         if (parsed := cls.pattern.match(logline)) is not None:
             return parsed.groupdict()
 
