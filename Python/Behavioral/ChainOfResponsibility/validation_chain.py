@@ -2,12 +2,14 @@ from __future__ import annotations
 from typing import Optional
 
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 
 
+@dataclass
 class Status:
-    locked = True
-    alarm_on = True
-    light_on = False
+    locked: bool = True
+    alarm_on: bool = True
+    light_on: bool = False
 
 
 class CheckerInterface(ABC):
@@ -112,33 +114,35 @@ if __name__ == "__main__":
 
     lock.set_next(alarm).set_next(light)
 
+    status = Status()
+
     print("Chain: Lock > Alarm > Light\n")
 
     print("First check:")
-    lock.check(Status)
+    lock.check(status)
 
     print("\nTurn the light on")
-    Status.light_on = True
-    lock.check(Status)
+    status.light_on = True
+    lock.check(status)
 
     print("\nTurn the lock open")
-    Status.locked = False
-    lock.check(Status)
+    status.locked = False
+    lock.check(status)
 
     print("\n")
     print("Reset the status to (OK) state\n\n")
-    Status.locked = True
-    Status.light_on = False
+    status.locked = True
+    status.light_on = False
 
     print("Subchain: Alarm > Light\n")
 
     print("First check:")
-    alarm.check(Status)
+    alarm.check(status)
 
     print("\nTurn the lock open")
-    Status.locked = False
-    alarm.check(Status)
+    status.locked = False
+    alarm.check(status)
 
     print("\nTurn the light on")
-    Status.light_on = True
-    alarm.check(Status)
+    status.light_on = True
+    alarm.check(status)
