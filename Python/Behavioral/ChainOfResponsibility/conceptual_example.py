@@ -17,7 +17,7 @@ class HandlerInterface(ABC):
         pass
 
     @abstractmethod
-    def handle(self, request) -> Optional[str]:
+    def handle(self, request: Any) -> Optional[str]:
         pass
 
 
@@ -26,7 +26,8 @@ class AbstractHandler(HandlerInterface):
     The default chaining behavior is implemented inside a base handler class.
     """
 
-    _next_handler: HandlerInterface = None
+    def __init__(self) -> None:
+        self._next_handler: Optional[HandlerInterface] = None
 
     def set_next(self, handler: HandlerInterface) -> HandlerInterface:
         self._next_handler = handler
@@ -35,8 +36,8 @@ class AbstractHandler(HandlerInterface):
         return handler
 
     @abstractmethod
-    def handle(self, request: Any) -> str:
-        if self._next_handler:
+    def handle(self, request: Any) -> Optional[str]:
+        if self._next_handler is not None:
             return self._next_handler.handle(request)
 
         return None
@@ -45,8 +46,8 @@ class AbstractHandler(HandlerInterface):
 # All Concrete Handlers either handle a request or pass it to the next handler in the chain.
 
 class MonkeyHandler(AbstractHandler):
-    
-    def handle(self, request: Any) -> str:
+
+    def handle(self, request: Any) -> Optional[str]:
         if request == "Banana":
             return f"Monkey: I'll eat the {request}"
         else:
@@ -54,8 +55,8 @@ class MonkeyHandler(AbstractHandler):
 
 
 class SquirrelHandler(AbstractHandler):
-    
-    def handle(self, request: Any) -> str:
+
+    def handle(self, request: Any) -> Optional[str]:
         if request == "Nut":
             return f"Squirrel: I'll eat the {request}"
         else:
@@ -63,8 +64,8 @@ class SquirrelHandler(AbstractHandler):
 
 
 class DogHandler(AbstractHandler):
-    
-    def handle(self, request: Any) -> str:
+
+    def handle(self, request: Any) -> Optional[str]:
         if request == "MeatBall":
             return f"Dog: I'll eat the {request}"
         else:
@@ -88,7 +89,7 @@ def client_code(handler: HandlerInterface) -> None:
 
 if __name__ == "__main__":
     print()
-    
+
     monkey = MonkeyHandler()
     squirrel = SquirrelHandler()
     dog = DogHandler()
