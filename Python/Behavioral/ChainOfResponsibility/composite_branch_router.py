@@ -9,6 +9,54 @@ Trade-offs:
     domains, but increase the number of coordinating links traversed during processing.
 """
 
+
+"""
+Architectural comparison of in-memory chain routing and message bus dispatching.
+
+Modern application design offers two distinct paradigms for routing domain workflows:
+the object-oriented composite chain pattern, and the explicit message-driven architecture
+explored in Harry Percival and Bob Gregory's "Architecture Patterns with Python"
+(Cosmic Python) within their allocation and logistics domain.
+
+In the Cosmic Python architecture, domain interactions are formally defined as first-class
+abstractions: Commands (imperative intent with single handlers) and Events (historical
+facts broadcast to multiple subscribers), both descending from a unified Message contract.
+Because messages exist as independent domain entities, routing responsibility is externalized
+into a centralized Message Bus mapping table.
+
+In contrast, this composite chain implementation relies on an implicit message model. The
+payload is bundled within an execution context, while routing rules, category matching, and
+delegation choices are decentralized directly into composite branches and concrete leaves.
+The traversal topology itself serves as the dispatching engine.
+
+In-Memory Composite Chain (Implicit Context Routing):
+    Pros:
+        - Executes within a single Python process with zero operational or network overhead.
+        - Provides immediate synchronous feedback and deterministic call-stack execution order.
+        - Keeps domain rules close to leaf logic without requiring an external bus abstraction.
+    Cons:
+        - Couples handler traversal order to neighboring node references or branch hierarchies.
+        - Restricted to single-process throughput constrained by the Python runtime and GIL.
+        - Dispatches requests along a point-to-point chain, making pub-sub fan-out unwieldy.
+
+Event-Driven Architecture (Reified Message Bus):
+    Pros:
+        - Reifies Commands and Events as explicit data contracts decoupled from execution logic.
+        - Enables temporal decoupling and durable persistence via message brokers (e.g., Redis).
+        - Allows independent horizontal scaling of specialized worker pools and consumers.
+    Cons:
+        - Introduces infrastructure dependencies, network hops, and operational maintenance.
+        - Requires distributed tracing, outbox patterns, and eventual consistency management.
+        - Replaces simple local function invocations with message serialization and bus dispatch.
+
+Trade-offs:
+    Choose the in-memory composite chain for self-contained, low-latency business logic
+    requiring immediate synchronous validation without operational complexity. Choose the
+    reified message bus pattern when system components require temporal decoupling, multiple
+    subscribers per event, horizontal worker elasticity, and transactional persistence.
+"""
+
+
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from decimal import Decimal
