@@ -11,6 +11,23 @@ Trade-offs:
 
 
 """
+Organizational domain alignment and multi-team ownership.
+
+Pros:
+- Maps domain branches directly to dedicated business units and domain experts.
+- Isolates leaf verification rules within cohesive departmental subtrees.
+- Allows teams to implement domain logic independently behind shared handler contracts.
+Cons:
+- Departmental routing coupling remains bound to hardcoded tree topology.
+- Cross-branch integration still requires global taxonomy coordination.
+
+Trade-offs:
+    Co-locating routing rules within composite branches simplifies local domain changes,
+    but couples overall organizational workflow to compile-time tree composition.
+"""
+
+
+"""
 Architectural comparison of in-memory chain routing and message bus dispatching.
 
 Modern application design offers two distinct paradigms for routing domain workflows:
