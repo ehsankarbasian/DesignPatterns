@@ -1,11 +1,12 @@
 from abc import ABC, abstractmethod
+from typing import List
 
 
-# Declares contract for registering subscribers and querying subject state.
+# Declares contract for registering subscribers and exposing pull query state.
 # Subject Interface
 class PublisherInterface(ABC):
     """
-    Contract for publishers supporting subscriber management and state polling.
+    Contract for publishers managing subscribers and exposing pull query state.
     """
 
     @abstractmethod
@@ -22,7 +23,7 @@ class PublisherInterface(ABC):
 
     @property
     @abstractmethod
-    def latest_not_notified(self):
+    def latest_not_notified(self) -> List[str]:
         pass
 
 
@@ -37,7 +38,7 @@ class SimpleObservable(ABC):
     """
 
     def __init__(self) -> None:
-        self._subscribers = []
+        self._subscribers: List["SubscriberInterface"] = []
 
     def register(self, subscriber: "SubscriberInterface") -> None:
         self._subscribers.append(subscriber)
@@ -50,7 +51,7 @@ class SimpleObservable(ABC):
             subscriber.update(self)
 
     @property
-    def subscribers(self):
+    def subscribers(self) -> List[str]:
         return [type(s).__name__ for s in self._subscribers]
 
 
@@ -63,27 +64,27 @@ class PublisherBook(SimpleObservable, PublisherInterface):
 
     def __init__(self) -> None:
         super().__init__()
-        self.__latest_books = []
-        self.__all_books = []
+        self._latest_books: List[str] = []
+        self._all_books: List[str] = []
 
     def notify_subscribers(self) -> None:
         super().notify_subscribers()
         self._clear_latest_books()
 
     def _clear_latest_books(self) -> None:
-        self.__latest_books = []
+        self._latest_books = []
 
     def add_book(self, book: str) -> None:
-        self.__all_books.append(book)
-        self.__latest_books.append(book)
+        self._all_books.append(book)
+        self._latest_books.append(book)
 
     @property
-    def all_books(self):
-        return self.__all_books
+    def all_books(self) -> List[str]:
+        return self._all_books
 
     @property
-    def latest_not_notified(self):
-        return self.__latest_books
+    def latest_not_notified(self) -> List[str]:
+        return self._latest_books
 
 
 # Manages published articles and provides state query for pulling observers.
@@ -95,27 +96,27 @@ class PublisherArticle(SimpleObservable, PublisherInterface):
 
     def __init__(self) -> None:
         super().__init__()
-        self.__latest_articles = []
-        self.__all_articles = []
+        self._latest_articles: List[str] = []
+        self._all_articles: List[str] = []
 
     def notify_subscribers(self) -> None:
         super().notify_subscribers()
         self._clear_latest_articles()
 
     def _clear_latest_articles(self) -> None:
-        self.__latest_articles = []
+        self._latest_articles = []
 
     def add_article(self, article: str) -> None:
-        self.__all_articles.append(article)
-        self.__latest_articles.append(article)
+        self._all_articles.append(article)
+        self._latest_articles.append(article)
 
     @property
-    def all_articles(self):
-        return self.__all_articles
+    def all_articles(self) -> List[str]:
+        return self._all_articles
 
     @property
-    def latest_not_notified(self):
-        return self.__latest_articles
+    def latest_not_notified(self) -> List[str]:
+        return self._latest_articles
 
 
 # Declares observer contract receiving subject reference to pull state.
@@ -193,7 +194,7 @@ if __name__ == '__main__':
 
     publisher_book.add_book("Clean Code")
     publisher_book.notify_subscribers()
-    
+
     # Use article publisher
     publisher_article = PublisherArticle()
     publisher_article.register(sms_subscriber)
