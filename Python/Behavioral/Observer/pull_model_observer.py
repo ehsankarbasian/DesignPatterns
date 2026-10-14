@@ -2,6 +2,16 @@ from abc import ABC, abstractmethod
 from typing import List
 
 
+"""
+Implements the Pull model variant of the Observer pattern where the subject
+broadcasts minimal notifications and observers explicitly query for state changes.
+
+Trade-offs:
+    - Maximizes subject ignorance and observer reusability by avoiding specific update protocols.
+    - Introduces potential inefficiency as observers must independently ascertain what changed without direct payload assistance from the subject.
+"""
+
+
 # Declares contract for registering subscribers and exposing pull query state.
 # Subject Interface
 class PublisherInterface(ABC):
