@@ -40,17 +40,18 @@ Trade-offs
 
 """
 Relational Algebra Perspective:
-    1. Relationship Topology:
-       Models subscriptions as an explicit many-to-many (M:N) relation between
-       Subject and Observer domains, avoiding hard coupling across boundaries.
 
-    2. Associative Entity (Join Table):
-       The Subscription token materializes this link as an independent entity,
-       converting implicit behavioral dependencies into a discrete relation record.
+1. Relationship Topology:
+    Models subscriptions as an explicit many-to-many (M:N) relation between
+    Subject and Observer domains, avoiding hard coupling across boundaries.
 
-    3. Deterministic Lifecycle:
-       Disposal directly mirrors tuple deletion in relational algebra, enabling
-       isolated, idempotent lifecycle management without leaking domain references.
+2. Associative Entity (Join Table):
+    The Subscription token materializes this link as an independent entity,
+    converting implicit behavioral dependencies into a discrete relation record.
+
+3. Deterministic Lifecycle:
+    Disposal directly mirrors tuple deletion in relational algebra, enabling
+    isolated, idempotent lifecycle management without leaking domain references.
 """
 
 
@@ -146,6 +147,19 @@ class SimpleObservable(ABC):
         self._subscribers: List["SubscriberInterface"] = []
 
     def subscribe(self, subscriber: "SubscriberInterface") -> SubscriptionInterface:
+        """
+        Registers an observer and yields a lifecycle token wrapping an unsubscription closure.
+
+        Mechanics:
+            Captures lexical scope ('self' and 'subscriber') inside an inner 'unsubscribe'
+            function, creating a stateful closure that decouples the Subject's internal
+            collection mechanics from the returned token.
+
+        Decoupling:
+            Passes the unregister action as a callable hook to Subscription, allowing
+            the token to execute idempotent cleanup without retaining direct subject or observer dependencies.
+        """
+
         self._subscribers.append(subscriber)
 
         def unsubscribe() -> None:
