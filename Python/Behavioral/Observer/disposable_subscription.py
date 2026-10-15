@@ -37,6 +37,23 @@ Trade-offs
     deterministic memory reclamation, and decoupled architectural boundaries.
 """
 
+
+"""
+Relational Algebra Perspective:
+    1. Relationship Topology:
+       Models subscriptions as an explicit many-to-many (M:N) relation between
+       Subject and Observer domains, avoiding hard coupling across boundaries.
+
+    2. Associative Entity (Join Table):
+       The Subscription token materializes this link as an independent entity,
+       converting implicit behavioral dependencies into a discrete relation record.
+
+    3. Deterministic Lifecycle:
+       Disposal directly mirrors tuple deletion in relational algebra, enabling
+       isolated, idempotent lifecycle management without leaking domain references.
+"""
+
+
 from abc import ABC, abstractmethod
 from typing import Callable, List, Optional
 
