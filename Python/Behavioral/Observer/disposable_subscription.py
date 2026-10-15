@@ -2,34 +2,39 @@
 Demonstrates the Disposable Subscription Token pattern in Observer architecture.
 
 Problem: The Lapsed Listener and Strong Coupling Problem
-In the traditional Observer pattern (GoF), unregistering requires an explicit
-call such as subject.detach(observer). This architecture creates two severe issues:
-1. Coupling: The subscriber or caller must maintain a direct reference to the
-   subject throughout its lifetime simply to unsubscribe later.
-2. Memory Leaks (Lapsed Listener): Subjects retain strong references to registered
-   observers. If callers discard observer references without detaching them, the
-   garbage collector cannot reclaim observer instances, leading to cumulative
-   memory leaks and redundant event notifications.
+In event-driven architectures, unregistering observers typically faces three design choices:
+1. Subject-Centric De-registration (subject.unsubscribe(observer)):
+   - Forces the client to maintain persistent references to both Subject and Observer.
+   - High coupling; violates Single Responsibility and interface segregation.
+2. Observer-Centric De-registration (observer.unsubscribe()):
+   - Forces the Observer to either retain Subject references or limits it to a single Subject.
+   - Degrades cohesion and breaks multi-subject subscription topologies.
+3. Subscription Token Abstraction (Subscription Object):
+   - Decouples both parties by introducing a first-class intermediate lifecycle token.
+   - The token acts as an associative entity encapsulating an idempotent unregistration closure.
 
-Solution: Subscription Token (Disposable) Abstraction
-Instead of returning None, subscribe() yields an intermediate Subscription token.
-This token encapsulates the unregistration hook, manages its own active lifecycle,
-and implements Python context management protocols (__enter__ / __exit__).
-The subscriber no longer needs any knowledge of the subject.
+Memory Leak (Lapsed Listener) Vector:
+    Subjects retain strong references to registered observers. Discarding observer
+    references without explicit unregistration causes cumulative memory leaks, as the
+    garbage collector is prevented from reclaiming unreachable listener instances.
 
-Pros
-- Complete decoupling of unregistration logic from subject identity.
-- First-class support for scoped temporary subscriptions via 'with' blocks.
-- Safe idempotent disposal preventing duplicate removal crashes.
-- Elimination of lingering object graph retention when token is disposed.
+Solution: Subscription Token (Disposable) Protocol
+Instead of returning None, subscribe() yields a Subscription token implementing
+deterministic cleanup and Python context management protocols (__enter__ / __exit__).
 
-Cons
-- Introduces an extra intermediate object allocation per subscription.
-- Callers must capture and retain the subscription token to trigger manual disposal.
+Pros:
+    - Decouples unregistration mechanics completely from subject and observer identities.
+    - Enables scoped temporary subscriptions using 'with' context manager blocks.
+    - Guarantees idempotent disposal, safely ignoring redundant unregister calls.
+    - Breaks reference retention cycles by nullifying closures upon disposal.
+
+Cons:
+    - Incurs a lightweight intermediate object allocation per subscription.
+    - Requires callers to retain the token when managing non-scoped lifecycles.
 
 Trade-offs
-    Trading additional per-subscription object overhead for deterministic
-    lifecycle management and memory-leak prevention across module boundaries.
+    Trades minor per-subscription allocation overhead for strict lifecycle safety,
+    deterministic memory reclamation, and decoupled architectural boundaries.
 """
 
 from abc import ABC, abstractmethod
