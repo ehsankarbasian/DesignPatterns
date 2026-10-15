@@ -30,6 +30,26 @@ Cons of the Aggregated Pull Model:
       consistent and accessible throughout the duration of the query phase.
 """
 
+
+"""
+Lifecycle and Memory Management Note:
+    Dual-role intermediate nodes acting simultaneously as Observers and Observables
+    (e.g., SensorBatch) introduce significant memory leak vulnerabilities (Lapsed Listener):
+    
+    1. Upstream Dangling References: If a batch node goes out of scope while still
+       registered in long-lived leaf subjects, the subjects retain strong references,
+       preventing garbage collection of the entire batch hierarchy.
+    2. Downstream Dangling References: If leaf subjects become obsolete while the batch
+       persists, the batch retains orphaned leaf references unless explicitly detached.
+
+    Mitigation Strategy:
+        To maintain modular cohesion, subscription lifecycle mechanics are decoupled
+        from this file. For production lifecycle safety and deterministic teardown,
+        compose this topology with the disposable pattern implemented in
+        `disposable_subscription.py`.
+"""
+
+
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
