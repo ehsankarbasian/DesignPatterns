@@ -7,7 +7,7 @@ import sys
 path = str(pathlib.Path(__file__).parent.parent.absolute())
 sys.path.append(path)
 
-from prototype_with_registry import ShapeRegistry, Rectangle, Circle
+from prototype_registry import ShapeRegistry, Rectangle, Circle
 
 
 class PrototypeRegistryTestCase(TestCase):

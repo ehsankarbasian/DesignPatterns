@@ -9,7 +9,7 @@ import sys
 path = str(pathlib.Path(__file__).parent.parent.absolute())
 sys.path.append(path)
 
-from advanced_example import SelfReferencingEntity, SomeComponent
+from custom_copy_protocol import SelfReferencingEntity, SomeComponent
 
 
 class ShallowCopyTestCase(TestCase):
