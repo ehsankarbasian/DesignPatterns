@@ -19,7 +19,51 @@ Trade-offs
     Independent allocations prevent implicit sharing of read-only cached resources.
 """
 
+
 from __future__ import annotations
+
+
+"""
+Gang of Four Motivation:
+    A reusable editor framework provides tools for creating graphical objects.
+    Application-specific graphics should not require matching tool subclasses
+    whose only distinction is the concrete object they construct.
+
+Client parameterization:
+    A creation tool receives a configured prototype through the prototype
+    interface. Each creation request clones that prototype, initializes the
+    instance-specific state, and inserts the new object into the document.
+    The tool depends on the cloning contract rather than concrete constructors.
+
+Reduced subclassing:
+    Different instances of the same tool class can hold different prototypes.
+    This reduces the need for a parallel hierarchy of creation tools while
+    preserving concrete graphic classes where their behavior differs.
+    The setup code still selects and constructs the initial prototypes.
+
+Registry connection:
+    Direct injection supplies a client with a particular prototype.
+    A prototype manager extends this arrangement by maintaining named
+    prototypes that clients can select at runtime.
+
+    WidgetRegistry demonstrates this management mechanism: setup code registers
+    configured widgets, and client code requests clones through registry keys.
+    The registry centralizes prototype lookup without changing the underlying
+    creation principle: new objects originate from existing instances.
+
+Cloning policy:
+    Prototype does not prescribe shallow copying or deep copying.
+    The implementation defines which state is duplicated and which references
+    remain shared. This example uses deep copying to isolate mutable widget
+    configuration between a prototype and its clones.
+
+Trade-offs
+    Direct prototype injection keeps a client's creation dependency explicit.
+    A registry supports runtime selection but introduces key management and
+    missing-prototype handling. Neither mechanism removes the need to establish
+    valid initial prototypes or define suitable clone initialization.
+"""
+
 
 import copy
 from abc import ABC, abstractmethod
