@@ -102,3 +102,40 @@ class SomeComponent:
         new_object.some_circular_ref = copy.deepcopy(self.some_circular_ref, memo)
 
         return new_object
+
+
+if __name__ == "__main__":
+    list_of_objects = [1, {1, 2, 3}, [1, 2, 3]]
+    circular_ref = SelfReferencingEntity()
+    component = SomeComponent(23, list_of_objects, circular_ref)
+    circular_ref.set_parent(component)
+
+    shallow_copied_component = copy.copy(component)
+    shallow_copied_component.some_list_of_objects.append("another object")
+    if component.some_list_of_objects[-1] == "another object":
+        print(
+            "Adding elements to `shallow_copied_component`'s "
+            "some_list_of_objects adds it to `component`'s "
+            "some_list_of_objects."
+        )
+    else:
+        print(
+            "Adding elements to `shallow_copied_component`'s "
+            "some_list_of_objects doesn't add it to `component`'s "
+            "some_list_of_objects."
+        )
+
+    deep_copied_component = copy.deepcopy(component)
+    deep_copied_component.some_list_of_objects.append("one more object")
+    if component.some_list_of_objects[-1] == "one more object":
+        print(
+            "Adding elements to `deep_copied_component`'s "
+            "some_list_of_objects adds it to `component`'s "
+            "some_list_of_objects."
+        )
+    else:
+        print(
+            "Adding elements to `deep_copied_component`'s "
+            "some_list_of_objects doesn't add it to `component`'s "
+            "some_list_of_objects."
+        )
