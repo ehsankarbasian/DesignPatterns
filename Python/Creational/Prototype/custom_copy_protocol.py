@@ -1,25 +1,58 @@
+"""
+Educational Prototype example demonstrating custom copy protocols in Python.
+
+Design goal:
+    Showcase how objects customize duplication semantics by implementing
+    __copy__ and __deepcopy__ dunder methods, enabling explicit control
+    over member aliasing, instance allocation, and recursive cycle resolution.
+
+Key decisions:
+    __copy__ creates a shallow replica by sharing nested mutable objects
+    while instantiating a distinct container.
+    __deepcopy__ allocates uninitialized instances via __new__ and immediately
+    populates the memo dictionary with the object identity before deep-copying
+    fields, breaking circular reference loops.
+
+Trade-offs
+    Custom protocol methods grant granular control over graph reconstruction,
+    yet increase maintenance burden as changes to internal fields require
+    synchronizing copy routines.
+"""
+
 import copy
 from typing import Dict, Optional
 
 
-'''
-You can override python copy.copy() and copy.deepcopy() functions
-Just override __copy__ and __deepcopy__ methods inside your class
-
-code from: https://refactoring.guru/design-patterns/prototype/python/example
-'''
-
-
 class SelfReferencingEntity:
+    """
+    Component collaborator establishing cyclical object references.
+    Collaborator role modeling back-references in interconnected domain graphs.
+
+    Trade-offs
+        Introducing cyclic references requires rigorous memoization during deep
+        traversal, risking infinite recursion if memo dictionaries are dropped.
+    """
 
     def __init__(self) -> None:
         self.parent: Optional["SomeComponent"] = None
 
     def set_parent(self, parent: "SomeComponent") -> None:
+        """
+        Bind the back-reference pointer to the owning component.
+        """
+        
         self.parent = parent
 
 
 class SomeComponent:
+    """
+    Compound prototype implementing customized copy dunder protocols.
+    Prototype role demonstrating shallow versus deep attribute replication.
+
+    Trade-offs
+        Bypassing standard copy automation via manual dunder implementations
+        ensures cycle resilience, but introduces boilerplate attribute wiring.
+    """
 
     def __init__(
         self,
@@ -33,6 +66,10 @@ class SomeComponent:
 
 
     def __copy__(self) -> "SomeComponent":
+        """
+        Produce a shallow copy with duplicated containers and shared references.
+        """
+
         some_list_of_objects = copy.copy(self.some_list_of_objects)
         some_circular_ref = copy.copy(self.some_circular_ref)
 
@@ -45,20 +82,13 @@ class SomeComponent:
 
 
     def __deepcopy__(self, memo: Optional[Dict[int, object]] = None) -> "SomeComponent":
-        # TODO: When internet is connected completely
-        # repair 'mutable default' anti-pattern in refactoring-guru original repository
-        # Do not commit it before doing that
-        # TODO: Add the pythonic_prototype_hint.md text to comments in the original repository
+        """
+        Produce a deep copy while utilizing a memo mapping to resolve reference cycles.
+        Allocates instance via __new__ to register identity before nested traversal.
+        """
+
         if memo is None:
             memo = {}
-
-        """
-        Memo is the dictionary that is used by the `deepcopy` library to
-        prevent infinite recursive copies in instances of circular references.
-
-        Pass it to all the `copy.deepcopy` calls in the `__deepcopy__`
-        implementation to prevent infinite recursions.
-        """
 
         existing = memo.get(id(self))
         if existing is not None:
