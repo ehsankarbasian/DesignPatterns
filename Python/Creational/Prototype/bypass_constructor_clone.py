@@ -33,7 +33,7 @@ Prototype-specific initialization:
     calls initialize_clone(), which resets that state without invoking
     __init__.
 
-Trade-offs:
+Trade-offs
     Explicit clone initialization keeps constructors simple and avoids
     re-running expensive construction steps for every clone. The cost is an
     additional method that must be kept in sync with the fields it resets;
@@ -46,16 +46,11 @@ from collections.abc import Sequence
 
 
 class ReportTemplate:
-    """Report template prototype demonstrating constructor bypass during cloning.
+    """
+    Report template prototype demonstrating constructor bypass during cloning.
+    Prototype role providing isolated cloned instances without re-executing __init__.
 
-    Key decisions:
-        Normal construction stores the title, an immutable sections tuple,
-        and a derived layout, then increments a class-level constructor
-        counter. clone() uses copy.deepcopy and then calls
-        initialize_clone() to reset clone-specific state, so __init__ and
-        its counter are bypassed during cloning.
-
-    Trade-offs:
+    Trade-offs
         The deepcopy preserves all internal state, but any new
         clone-specific field must also be added to initialize_clone();
         otherwise clones would inherit values meant to be per-instance.
@@ -64,6 +59,10 @@ class ReportTemplate:
     constructor_call_count: int = 0
 
     def __init__(self, title: str, sections: Sequence[str]) -> None:
+        """
+        Initialize the source report template and increment constructor invocation counter.
+        """
+
         self.title = title
         self.sections: tuple[str, ...] = tuple(sections)
         self.layout: str = f"{len(self.sections)} sections, single column"
@@ -73,6 +72,10 @@ class ReportTemplate:
 
 
     def render(self) -> str:
+        """
+        Simulate rendering the report, mutating the per-instance render count.
+        """
+
         self.render_count += 1
         return (
             f"Report '{self.title}' [{self.instance_label}]"
@@ -81,17 +84,30 @@ class ReportTemplate:
 
 
     def clone(self) -> "ReportTemplate":
+        """
+        Create a deep copy of the template and reset clone-specific instance state.
+        Bypasses __init__ execution completely while ensuring clean state initialization.
+        """
+
         cloned_template = copy.deepcopy(self)
         cloned_template.initialize_clone()
         return cloned_template
 
 
     def initialize_clone(self) -> None:
+        """
+        Explicitly reset per-instance state without invoking constructor logic.
+        """
+
         self.instance_label = "clone"
         self.render_count = 0
 
 
     def describe(self) -> str:
+        """
+        Return structured representation of internal state for inspection and logging.
+        """
+
         return (
             f"ReportTemplate(title={self.title!r}, sections={self.sections!r},"
             f" instance_label={self.instance_label!r},"
