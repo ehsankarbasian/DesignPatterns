@@ -70,13 +70,14 @@ class SomeComponent:
         Produce a shallow copy with duplicated containers and shared references.
         """
 
-        some_list_of_objects = copy.copy(self.some_list_of_objects)
-        some_circular_ref = copy.copy(self.some_circular_ref)
-
-        new_object = self.__class__(self.some_int, some_list_of_objects, some_circular_ref)
+        # In shallow copy, inner collections and nested objects must be shared by reference,
+        # not copied, so that mutations to collections reflect across shallow clones.
+        new_object = self.__class__(
+            self.some_int,
+            self.some_list_of_objects,
+            self.some_circular_ref,
+        )
         new_object.__dict__.update(self.__dict__)
-        new_object.some_list_of_objects = some_list_of_objects
-        new_object.some_circular_ref = some_circular_ref
 
         return new_object
 
