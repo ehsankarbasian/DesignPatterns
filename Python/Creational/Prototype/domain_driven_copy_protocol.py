@@ -35,3 +35,49 @@ Trade-offs:
     invariants, eliminates shared mutation bugs, and strictly enforces valid
     business lifecycle boundaries.
 """
+
+
+"""
+Domain topology and semantic boundaries for aggregate graph replication.
+
+Domain entities and structural topology:
+- Aggregate Root (Order):
+    Encapsulates transaction identity (order_id), monetary totals, payment tokens,
+    audit metadata (created_at, version), and business lifecycle (OrderStatus:
+    DRAFT, SUBMITTED, PAID, CANCELLED).
+- Child Entity (OrderLine):
+    Maintains line-level quantity, unit price, and an explicit back-reference
+    to its parent Order, forming a cyclical graph that prevents naive recursive
+    traversal without cycle detection.
+- Shared Reference Context (CustomerProfile & ProductCatalogItem):
+    Immutable master data referenced across multiple aggregate instances. These
+    nodes must retain shared identity across clones to prevent memory bloat and
+    data divergence.
+
+Domain knowledge embedded in Python copy protocols:
+- Mechanical vs. Domain-driven cloning:
+    Standard Python copy mechanisms (copy.deepcopy) duplicate graph topology
+    indiscriminately. Domain-driven cloning intercepts __deepcopy__ to inject
+    business rules directly into the duplication pipeline.
+- Cycle resolution via memo dictionary:
+    Passing memo through the recursive copy graph ensures parent-child circular
+    references bind to newly instantiated aggregate instances rather than leaking
+    references back to the original graph.
+- Identity regeneration policy:
+    Aggregates cannot share identity. Duplicating an order generates fresh UUIDs
+    for both Order and OrderLine entities, establishing complete entity independence.
+- State and audit sanitization:
+    Cloning an order in terminal states (PAID, SHIPPED) enforces automatic reset
+    to DRAFT status, clears external transaction identifiers, and reinitializes
+    creation timestamps and version increments.
+- Hybrid reference demarcation:
+    The copy protocol enforces explicit boundary policies: internal aggregate
+    entities undergo deep duplication, whereas shared master data (catalog items
+    and customer profiles) remain shallow references.
+
+Trade-offs:
+    Embedding aggregate domain rules directly within __deepcopy__ couples domain
+    entities to Python runtime traversal internals, but eliminates detached
+    factory boilerplate and guarantees that all duplication paths strictly enforce
+    business invariants.
+"""
