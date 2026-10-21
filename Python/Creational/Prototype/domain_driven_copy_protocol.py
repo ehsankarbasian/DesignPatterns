@@ -305,3 +305,125 @@ class Order:
 #   services to keep the domain entity free from transactional I/O concerns.
 # - The memo dictionary ensures that cyclic references between Order and OrderLine
 #   bind strictly to newly allocated instances without graph leakage.
+
+
+# TODO: Convert this manual scenario into automated tests later.
+if __name__ == "__main__":
+    print("Starting the order cloning demonstration.")
+    print("The program creates an order, clones it, then checks what was copied and what was reset.")
+    print()
+
+    print("Creating customer and catalog items...")
+    customer = CustomerProfile(
+        customer_id=uuid4(),
+        legal_name="Global Logistics Corp",
+        tax_id="US-99887766",
+    )
+
+    laptop = ProductCatalogItem(
+        sku="SKU-TECH-01",
+        name="Developer Workstation",
+        base_price=Decimal("2500.00"),
+    )
+
+    monitor = ProductCatalogItem(
+        sku="SKU-TECH-02",
+        name="4K Ultra-wide Display",
+        base_price=Decimal("800.00"),
+        is_discontinued=True,
+    )
+    print("Created one customer and two catalog items.")
+    print()
+
+    print("Building the original order...")
+    original_order = Order.create_draft(customer=customer)
+    original_order.add_line(laptop, quantity=2)
+    original_order.add_line(monitor, quantity=1)
+    original_order.status = OrderStatus.PAID
+    original_order.payment_reference = "PAY-TX-998811"
+    original_order.external_tracking_token = "*******"
+    original_order.version = 4
+
+    print("The order now contains two workstations and one display.")
+    print("It is marked as paid and has audit and tracking data.")
+    print(f"Original order ID: {original_order.order_id}")
+    print(f"Original status: {original_order.status.name}")
+    print(f"Original total: ${original_order.total()}")
+    print(f"Original line count: {len(original_order.lines)}")
+    print("Original tracking token: [REDACTED]")
+    print()
+
+    print("Cloning the order...")
+    cloned_order = original_order.clone()
+    print(f"Clone created with order ID: {cloned_order.order_id}")
+    print()
+
+    print("Checking identity independence...")
+    order_ids_are_different = (
+        original_order.order_id != cloned_order.order_id
+    )
+    line_ids_are_different = all(
+        original_line.line_id != cloned_line.line_id
+        for original_line, cloned_line in zip(
+            original_order.lines,
+            cloned_order.lines,
+        )
+    )
+    print(f"Does the clone have a new order ID? {order_ids_are_different}")
+    print(f"Do cloned lines have new IDs? {line_ids_are_different}")
+    print()
+
+    print("Checking which order state was copied...")
+    print(f"Original status: {original_order.status.name}")
+    print(f"Cloned status: {cloned_order.status.name}")
+    print(f"Original payment reference: {original_order.payment_reference}")
+    print(f"Cloned payment reference: {cloned_order.payment_reference}")
+    print(f"Original version: {original_order.version}")
+    print(f"Cloned version: {cloned_order.version}")
+    print("Tracking tokens are not displayed.")
+    print()
+
+    print("Checking shared master data...")
+    same_customer = cloned_order.customer is original_order.customer
+    same_first_catalog_item = (
+        cloned_order.lines[0].catalog_item
+        is original_order.lines[0].catalog_item
+    )
+    print(f"Does the clone reuse the same customer object? {same_customer}")
+    print(
+        "Does the clone reuse the same first catalog item? "
+        f"{same_first_catalog_item}"
+    )
+    print()
+
+    print("Checking that cloned order lines point to the cloned order...")
+    all_lines_point_to_clone = all(
+        line.order is cloned_order
+        for line in cloned_order.lines
+    )
+    any_line_points_to_original = any(
+        line.order is original_order
+        for line in cloned_order.lines
+    )
+    print(f"Do all cloned lines reference the clone? {all_lines_point_to_clone}")
+    print(
+        "Does any cloned line still reference the original order? "
+        f"{any_line_points_to_original}"
+    )
+    print()
+
+    print("Changing the quantity on the cloned order...")
+    original_quantity_before = original_order.lines[0].quantity
+    original_total_before = original_order.total()
+
+    cloned_order.lines[0].quantity = 10
+
+    print(f"Original quantity before change: {original_quantity_before}")
+    print(f"Original quantity after change: {original_order.lines[0].quantity}")
+    print(f"Cloned quantity after change: {cloned_order.lines[0].quantity}")
+    print(f"Original total before change: ${original_total_before}")
+    print(f"Original total after change: ${original_order.total()}")
+    print(f"Cloned total after change: ${cloned_order.total()}")
+    print()
+
+    print("Demonstration complete.")
