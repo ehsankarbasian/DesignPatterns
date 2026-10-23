@@ -51,6 +51,21 @@ Monetary calculations
 All monetary values use Decimal to avoid floating-point inaccuracies.
 """
 
+
+"""
+TODO: Refactor and harden basket discount strategies for enterprise constraints.
+
+Domain Refinement & Edge Cases:
+- Enforce strict monetary quantization and rounding boundaries consistently (avoiding mixed precision Decimals).
+- Add robust invariant guards and edge-case handling for negative totals, over-gross discounts,
+  empty basket execution, and strict loyalty threshold boundaries.
+- Extract core invariant clamping logic into a dedicated value-object or helper to keep the basket
+  aggregate root clean and adhere to the Single Responsibility Principle (SRP).
+- Integrate an optional observability/logging hook to trace strategy selection, raw discount calculations,
+  and final clamped adjustments without tightly coupling side effects to pricing logic.
+"""
+
+
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
