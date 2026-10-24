@@ -44,6 +44,46 @@ from decimal import Decimal
 from typing import Iterable, List
 
 
+"""
+Domain model for loan application evaluation and operational verification lifecycle.
+
+The domain tracks customer loan applications moving from initial submission through
+internal verification stages to final approval or rejection.
+
+Account classification and invariants
+    Applicants hold account profiles characterized by a credit assessment score and
+    a requested loan amount.
+    Credit score reflects applicant risk assessment and must be a non-negative integer.
+    Requested loan amount represents the principal credit requested and must be a
+    non-negative Decimal quantity.
+
+Operational stages and steps
+    The verification pipeline comprises discrete operational legs evaluating applicant
+    eligibility criteria:
+    Expert approval step validates applicant trustworthiness by requiring a minimum
+    credit assessment score of 70.
+    Financial manager approval step validates institutional exposure by enforcing an
+    upper loan limit cap of 50000.00.
+    A stage succeeds when every constituent verification step satisfies its respective
+    domain policy; otherwise, the stage reports failure.
+
+State progression and business lifecycle
+    Pending: The application is newly registered and awaits verification pipeline execution.
+    Internal review: Initial verification checks succeed, recording successful audit milestones
+    while application terms undergo institutional processing.
+    Awaiting applicant confirmation: Internal verifications pass, presenting loan terms
+    to the applicant whose formal confirmation triggers loan commitment.
+    Approved: The application lifecycle successfully concludes after applicant acceptance.
+    Rejected: Failure at any operational verification leg terminates the progression,
+    retaining the failure stage context in the aggregate history.
+
+Trade-offs:
+    - Encapsulating verification policies inside pipeline steps isolates transient business
+      thresholds from the aggregate lifecycle, but requires the aggregate context to interpret
+      pipeline outcomes explicitly to advance domain states.
+"""
+
+
 class StateInterface(ABC):
     """
     Contract for domain states describing stable business classifications.
